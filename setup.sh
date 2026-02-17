@@ -1,9 +1,10 @@
 ### VARIABLES TO CHANGE - START
-PROJECT_ID=
-PROJECT_NUMBER=
-SERVICE_NAME=
-GITHUB_ORG=
-GITHUB_REPO=
+PROJECT_ID=amya-brooks-hu
+PROJECT_NUMBER=825239029039
+SERVICE_NAME=kapstone-website
+GITHUB_ORG=CodePath-Tech-Exchange-CTEx
+GITHUB_REPO=ise-lab2-cicd-kapstone
+
 ### VARIABLES TO CHANGE - END
 
 # ----------- Set Up GCP Project ----------- #
