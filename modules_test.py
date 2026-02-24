@@ -51,33 +51,28 @@ class TestDisplayPost(unittest.TestCase):
 class TestDisplayActivitySummary(unittest.TestCase):
     """Tests the display_activity_summary function."""
 
-    def test_mockup_exact_data(self): # Line written by Gemini
-        """Verifies totals: 6.7 miles, 9,860 steps, and 740 calories.""" # Line written by Gemini
-        # Final numbers: 3200 + 2750 + 3910 = 9860 steps
+    def test_mockup_exact_data(self):
         mockup_data = [ # Line written by Gemini
             { # Workout 1
                 "start_time": "7:30 AM", "end_time": "8:10 AM", # Line written by Gemini
                 "distance": 2.1, "steps": 3200, "calories": 260, # Line written by Gemini
                 "start_coords": (0,0), "end_coords": (0,0) # Line written by Gemini
-            }, # Line written by Gemini
+            }, 
             { # Workout 2
                 "start_time": "1:00 PM", "end_time": "1:35 PM", # Line written by Gemini
                 "distance": 1.9, "steps": 2750, "calories": 210, # Line written by Gemini
                 "start_coords": (0,0), "end_coords": (0,0) # Line written by Gemini
-            }, # Line written by Gemini
+            },
             { # Workout 3
                 "start_time": "6:45 PM", "end_time": "7:25 PM", # Line written by Gemini
                 "distance": 2.7, "steps": 3910, "calories": 270, # Line written by Gemini
                 "start_coords": (0,0), "end_coords": (0,0) # Line written by Gemini
-            } # Line written by Gemini
-        ] # Line written by Gemini
+            } 
+        ]
         
-        # Executes the summary; look for 9,860 in the output!
         result = display_activity_summary(mockup_data) # Line written by Gemini
         self.assertIsNone(result, "The function must return None.") # Line written by Gemini
 
-    def test_empty_list_safety(self): # Line written by Gemini
-        """Ensures the function handles zero workouts gracefully.""" # Line written by Gemini
         result = display_activity_summary([]) # Line written by Gemini
         self.assertIsNone(result) # Line written by Gemini
 
