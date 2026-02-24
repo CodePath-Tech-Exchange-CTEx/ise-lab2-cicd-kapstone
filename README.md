@@ -1,10 +1,11 @@
-# TODO: Replace with your team name
+# Kapstone
 
-## Our Team
-
-TODO: Replace with your team members
-
-# Setup
+Kevin Wright, 
+Amya Brooks,
+Johnny Aryeetey, 
+Pratham Pathak
+ # Website: 
+ https://kapstone-website-vfeyueqh6q-uc.a.run.app/ 
 
 One person needs to follow SETUP.md to complete setup. Ignore this if it is already done for you!
 
