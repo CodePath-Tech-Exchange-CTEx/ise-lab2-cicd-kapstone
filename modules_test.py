@@ -92,11 +92,20 @@ class TestDisplayActivitySummary(unittest.TestCase):
 
 
 class TestDisplayGenAiAdvice(unittest.TestCase):
-    """Tests the display_genai_advice function."""
 
-    def test_foo(self):
-        """Tests foo."""
-        pass
+    def test_function_signature(self):
+        import inspect
+        sig = inspect.signature(display_genai_advice)
+        params = list(sig.parameters.keys())
+        self.assertIn("timestamp", params)
+        self.assertIn("content", params)
+        self.assertIn("image", params)
+
+    def test_returns_none(self):
+        import inspect
+        sig = inspect.signature(display_genai_advice)
+        ret = sig.return_annotation
+        self.assertIn(ret, [inspect.Parameter.empty, None])
 
 
 class TestDisplayRecentWorkouts(unittest.TestCase):

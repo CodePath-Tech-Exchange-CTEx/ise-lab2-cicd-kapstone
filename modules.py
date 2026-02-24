@@ -99,5 +99,18 @@ def display_recent_workouts(workouts_list):
 
 
 def display_genai_advice(timestamp, content, image):
-    """Write a good docstring here."""
+    def display_genai_advice(timestamp, content, image):
+        import streamlit as st
+
+    st.subheader("💡 AI-Powered Advice")
+    st.caption(f"Generated on: {timestamp}")
+
+    col1, col2 = st.columns([2, 1])
+
+    with col1:
+        st.markdown("### Your Personalized Advice")
+        st.write(content)
+
+    with col2:
+        st.image(image, caption="Stay Motivated!", use_column_width=True)
     pass
