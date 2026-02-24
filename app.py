@@ -20,8 +20,8 @@ def display_app_page():
     # An example of displaying a custom component called "my_custom_component"
     value = st.text_input('Enter your name')
     display_my_custom_component(value)
-   
-   # Display post
+
+    # Display post
     username = st.text_input("Enter username")
     user_image = st.file_uploader("profile image", type=["jpg", "jpeg", "png"])
     content = st.text_area("workout description")
@@ -29,12 +29,27 @@ def display_app_page():
     if st.button("Post"):
         if username == "":
             st.warning("please enter username")
-        elif len(content)> 280 or len(content)< 1:
+        elif len(content) > 280 or len(content) < 1:
             st.warning("description must be between 1 and 280 characters")
-        else:    
-            display_post(username, user_image, datetime.now(),content, post_image) 
+        else:
+            display_post(username, user_image, datetime.now(), content, post_image)
+
+    # Display GenAI advice
+    st.divider()
+    advice = get_genai_advice(userId)
+    display_genai_advice(advice['timestamp'], advice['content'], advice['image'])
+
+    # Display activity summary
+    st.divider()
+    workouts = get_user_workouts(userId)
+    display_activity_summary(workouts)
+
+    # Display recent workouts
+    st.divider()
+    display_recent_workouts(workouts)
 
 
 # This is the starting point for your app. You do not need to change these lines
 if __name__ == '__main__':
     display_app_page()
+    
