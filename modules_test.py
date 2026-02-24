@@ -102,9 +102,19 @@ class TestDisplayGenAiAdvice(unittest.TestCase):
 class TestDisplayRecentWorkouts(unittest.TestCase):
     """Tests the display_recent_workouts function."""
 
-    def test_foo(self):
-        """Tests foo."""
-        pass
+    def test_display_recent_workouts_runs(self):
+        """Tests if the function processes a list of workouts without crashing.""" 
+        sample_data = [
+            {'distance': 3.5, 'steps': 4500, 'calories': 250},
+            {'distance': 1.2, 'steps': 1500, 'calories': 80}
+        ] # Line written by Gemini
+        try:
+            display_recent_workouts(sample_data) 
+            success = True 
+        except Exception:
+            success = False 
+        
+        self.assertTrue(success, "Function failed to process workout list") 
 
 
 if __name__ == "__main__":
