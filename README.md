@@ -2,6 +2,7 @@
 
 Kevin Wright, 
 Amya Brooks
+Johnny Aryeetey
 
 One person needs to follow SETUP.md to complete setup. Ignore this if it is already done for you!
 
