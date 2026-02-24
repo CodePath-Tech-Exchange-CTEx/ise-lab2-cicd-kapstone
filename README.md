@@ -1,8 +1,8 @@
-# TODO: Replace with your team name
+# Kapstone
 
 ## Kapstone
 
-TODO: Replace with your team members
+Kevin Wright, 
 
 # Amya Brooks
 
