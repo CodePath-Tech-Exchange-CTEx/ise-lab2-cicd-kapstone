@@ -63,9 +63,12 @@ def display_activity_summary(workouts_list):
         return None 
 
     
-    total_dist = sum(w.get('distance', 0) for w in workouts_list) # Line written by Gemini
-    total_steps = sum(w.get('steps', 0) for w in workouts_list) # Line written by Gemini
-    total_cals = sum(w.get('calories', 0) for w in workouts_list) # Line written by Gemini
+    total_dist = sum(w.get('distance', 0) for w in workouts_list) 
+    # Line written by Gemini
+    total_steps = sum(w.get('steps', 0) for w in workouts_list)
+     # Line written by Gemini
+    total_cals = sum(w.get('calories', 0) for w in workouts_list) 
+    # Line written by Gemini
 
     # Header section 
     print("\n      Activity Summary")
@@ -78,12 +81,18 @@ def display_activity_summary(workouts_list):
     print(f"Total Calories: {total_cals}") 
     print("------------------------------") 
 
-    for i, w in enumerate(workouts_list, 1): # Line written by Gemini
-        start = w.get('start_time', 'None') # Line written by Gemini
-        end = w.get('end_time', 'None') # Line written by Gemini
-        dist = w.get('distance', 0) # Line written by Gemini
-        steps = w.get('steps', 0) # Line written by Gemini
-        cals = w.get('calories', 0) # Line written by Gemini
+    for i, w in enumerate(workouts_list, 1): 
+        # Line written by Gemini
+        start = w.get('start_time', 'None') 
+        # Line written by Gemini
+        end = w.get('end_time', 'None') 
+        # Line written by Gemini
+        dist = w.get('distance', 0) 
+        # Line written by Gemini
+        steps = w.get('steps', 0) 
+        # Line written by Gemini
+        cals = w.get('calories', 0) 
+        # Line written by Gemini
 
         print(f"\nWorkout {i}") 
         print(f"Start: {start}") 
