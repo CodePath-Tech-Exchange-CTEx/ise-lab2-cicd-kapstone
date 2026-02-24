@@ -1,7 +1,5 @@
 # Kapstone
 
-## Kapstone
-
 Kevin Wright, 
 Amya Brooks
 
