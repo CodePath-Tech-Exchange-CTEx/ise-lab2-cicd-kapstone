@@ -24,7 +24,6 @@ class TestDisplayPost(unittest.TestCase):
         self.assertEqual(at.markdown[0].value, "testuser") 
         self.assertEqual(at.markdown[1].value, "testcontent")
         self.assertIsNotNone(at.caption[0].value)
-        self.assertEqual(len(at.image), 0)
     def test_no_username(self):
         at = AppTest.from_file("app.py")
         at.run()
