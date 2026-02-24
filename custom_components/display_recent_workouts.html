@@ -1,0 +1,11 @@
+<div style="font-family: sans-serif;">
+    <h3>Recent Workouts</h3>
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+        {{#each WORKOUTS}}
+        <div style="border: 1px solid #eee; padding: 10px; border-radius: 8px; background-color: #f9f9f9;">
+            <p><strong>Distance:</strong> {{distance}} km</p>
+            <p><strong>Steps:</strong> {{steps}} | <strong>Calories:</strong> {{calories}}</p>
+        </div>
+        {{/each}}
+    </div>
+</div>
