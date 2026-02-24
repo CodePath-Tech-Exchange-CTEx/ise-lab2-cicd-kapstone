@@ -1,8 +1,8 @@
-# TODO: Replace with your team name
+# Kapstone
 
 ## Our Team
 
-TODO: Replace with your team members
+Kevin Wright, 
 
 # Setup
 
