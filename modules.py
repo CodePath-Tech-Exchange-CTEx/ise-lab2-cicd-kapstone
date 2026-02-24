@@ -47,15 +47,14 @@ def display_post(username, user_image, timestamp, content, post_image):
 
     col1, col2 = st.columns(2)
     with col1:
-        if user_image:
+        if user_image is not None:
             st.image(user_image, width=50)
     with col2:
         st.write(username)
-    if post_image:
-        st.image(post_image)
+    if post_image is not None:
+        st.image(post_image, width="stretch")
     st.write(content)
     st.caption(timestamp.strftime("%B %d, %Y at %I:%M %p"))
-
 
 def display_activity_summary(workouts_list):
     """
