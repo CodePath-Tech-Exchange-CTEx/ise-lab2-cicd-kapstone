@@ -1,10 +1,10 @@
 # TODO: Replace with your team name
 
-## Our Team
+## Kapstone
 
 TODO: Replace with your team members
 
-# Setup
+# Amya Brooks
 
 One person needs to follow SETUP.md to complete setup. Ignore this if it is already done for you!
 
