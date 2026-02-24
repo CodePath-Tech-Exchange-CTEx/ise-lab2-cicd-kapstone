@@ -35,8 +35,32 @@ def display_post(username, user_image, timestamp, content, post_image):
 
 
 def display_activity_summary(workouts_list):
-    """Write a good docstring here."""
-    pass
+    """Displays a summary of workout statistics including total distance, steps, and calories.
+    
+    Args:
+        workouts_list: list of workout dictionaries, each containing:
+            - distance: float (km)
+            - steps: int
+            - calories: int
+            - start_time: str
+            - end_time: str
+            - start_coordinates: tuple (optional)
+            - end_coordinates: tuple (optional)
+    """
+    # Calculate totals from the workouts list
+    total_distance = sum(w.get('distance', 0) for w in workouts_list)
+    total_steps = sum(w.get('steps', 0) for w in workouts_list)
+    total_calories = sum(w.get('calories', 0) for w in workouts_list)
+    
+    # Format numbers nicely
+    total_distance = round(total_distance, 1)
+    
+    data = {
+        'TOTAL_DISTANCE': str(total_distance),
+        'TOTAL_STEPS': str(total_steps),
+        'TOTAL_CALORIES': str(total_calories),
+    }
+    create_component(data, "display_activity_summary")
 
 
 def display_recent_workouts(workouts_list):
