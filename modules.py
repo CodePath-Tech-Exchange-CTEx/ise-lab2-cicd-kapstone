@@ -105,7 +105,7 @@ def display_activity_summary(workouts_list):
     return None
     
     # Render the component using the HTML file in custom_components/
-    create_component(data, "display_activity_summary") 
+    create_component(workouts_list, "display_activity_summary") 
 
 
 def display_recent_workouts(workouts_list):
