@@ -1,6 +1,6 @@
 ### VARIABLES TO CHANGE - START
-PROJECT_ID=
-SERVICE_NAME=
+PROJECT_ID='amya-brooks-hu'
+SERVICE_NAME='kapstone-website'
 ### VARIABLES TO CHANGE - END
 
 # ----------- Manual Deployment ------------ #

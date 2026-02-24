@@ -58,8 +58,30 @@ def display_post(username, user_image, timestamp, content, post_image):
 
 
 def display_activity_summary(workouts_list):
-    """Write a good docstring here."""
-    pass
+    """
+    Displays a summary of total activity statistics across all workouts.
+    
+    Args:
+        workouts_list: A list of dictionaries containing workout metrics.
+    """ # Line written by Gemini
+    # Calculate totals safely using .get() to avoid KeyErrors
+    total_distance = sum(w.get('distance', 0) for w in workouts_list) 
+    total_steps = sum(w.get('steps', 0) for w in workouts_list) 
+    total_calories = sum(w.get('calories', 0) for w in workouts_list) 
+    
+    # Format distance to 1 decimal place as requested
+    total_distance = round(total_distance, 1) 
+    
+    # Prepare the data dictionary for the HTML template
+    data = {
+        'TOTAL_DISTANCE': str(total_distance), 
+        'TOTAL_STEPS': str(total_steps), 
+        'TOTAL_CALORIES': str(total_calories), 
+        'NUM_WORKOUTS': len(workouts_list) 
+    } 
+    
+    # Render the component using the HTML file in custom_components/
+    create_component(data, "display_activity_summary") 
 
 
 def display_recent_workouts(workouts_list):

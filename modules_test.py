@@ -52,9 +52,44 @@ class TestDisplayPost(unittest.TestCase):
 class TestDisplayActivitySummary(unittest.TestCase):
     """Tests the display_activity_summary function."""
 
-    def test_foo(self):
-        """Tests foo."""
-        pass
+    def test_summary_with_valid_data(self):
+        """Tests summary calculation with a standard list of workouts.""" # Line written by Gemini
+        sample_workouts = [
+            {'distance': 5.2, 'steps': 7000, 'calories': 300},
+            {'distance': 3.1, 'steps': 4000, 'calories': 200}
+        ] # Line written by Gemini
+        try:
+            display_activity_summary(sample_workouts) # Line written by Gemini
+            success = True # Line written by Gemini
+        except Exception as e:
+            success = False # Line written by Gemini
+            print(f"Test failed with error: {e}") # Line written by Gemini
+        
+        self.assertTrue(success, "Function crashed with valid data") # Line written by Gemini
+
+    def test_summary_empty_list(self):
+        """Tests the function's ability to handle an empty workout list (edge case).""" # Line written by Gemini
+        try:
+            display_activity_summary([]) # Line written by Gemini
+            success = True # Line written by Gemini
+        except Exception:
+            success = False # Line written by Gemini
+            
+        self.assertTrue(success, "Function crashed on an empty list") # Line written by Gemini
+
+    def test_summary_missing_keys(self):
+        """Tests handling dictionaries with missing keys using .get() logic.""" # Line written by Gemini
+        buggy_workouts = [
+            {'distance': 1.0}, # Missing steps and calories
+            {'steps': 500}     # Missing distance and calories
+        ] # Line written by Gemini
+        try:
+            display_activity_summary(buggy_workouts) # Line written by Gemini
+            success = True # Line written by Gemini
+        except Exception:
+            success = False # Line written by Gemini
+            
+        self.assertTrue(success, "Function crashed when workout data was incomplete") # Line written by Gemini
 
 
 class TestDisplayGenAiAdvice(unittest.TestCase):
