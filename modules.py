@@ -85,8 +85,17 @@ def display_activity_summary(workouts_list):
 
 
 def display_recent_workouts(workouts_list):
-    """Write a good docstring here."""
-    pass
+    """
+    Displays a list of recent workouts, each showing distance, steps, and calories.
+    """ # Line written by Gemini
+    
+    # We pass the list directly to the component. 
+    # Your HTML will use a loop to display each one.
+    data = {
+        'WORKOUTS': workouts_list # Line written by Gemini
+    } # Line written by Gemini
+    
+    create_component(data, "display_recent_workouts") # Line written by Gemini
 
 
 def display_genai_advice(timestamp, content, image):
