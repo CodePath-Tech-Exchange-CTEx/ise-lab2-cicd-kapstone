@@ -58,27 +58,42 @@ def display_post(username, user_image, timestamp, content, post_image):
 
 
 def display_activity_summary(workouts_list):
-    """
-    Displays a summary of total activity statistics across all workouts.
+    if not workouts_list: 
+        print("No workouts recorded.") 
+        return None 
+
     
-    Args:
-        workouts_list: A list of dictionaries containing workout metrics.
-    """ # Line written by Gemini
-    # Calculate totals safely using .get() to avoid KeyErrors
-    total_distance = sum(w.get('distance', 0) for w in workouts_list) 
-    total_steps = sum(w.get('steps', 0) for w in workouts_list) 
-    total_calories = sum(w.get('calories', 0) for w in workouts_list) 
-    
-    # Format distance to 1 decimal place as requested
-    total_distance = round(total_distance, 1) 
-    
-    # Prepare the data dictionary for the HTML template
-    data = {
-        'TOTAL_DISTANCE': str(total_distance), 
-        'TOTAL_STEPS': str(total_steps), 
-        'TOTAL_CALORIES': str(total_calories), 
-        'NUM_WORKOUTS': len(workouts_list) 
-    } 
+    total_dist = sum(w.get('distance', 0) for w in workouts_list) # Line written by Gemini
+    total_steps = sum(w.get('steps', 0) for w in workouts_list) # Line written by Gemini
+    total_cals = sum(w.get('calories', 0) for w in workouts_list) # Line written by Gemini
+
+    # Header section 
+    print("\n      Activity Summary")
+    print("==============================") 
+    print("\nTotals Summary") 
+    # Change 'workouts' to 'workouts_list' here too
+    print(f"Total Workouts: {len(workouts_list)}") 
+    print(f"Total Distance: {total_dist:.1f} miles") 
+    print(f"Total Steps: {total_steps:,}") 
+    print(f"Total Calories: {total_cals}") 
+    print("------------------------------") 
+
+    for i, w in enumerate(workouts_list, 1): # Line written by Gemini
+        start = w.get('start_time', 'None') # Line written by Gemini
+        end = w.get('end_time', 'None') # Line written by Gemini
+        dist = w.get('distance', 0) # Line written by Gemini
+        steps = w.get('steps', 0) # Line written by Gemini
+        cals = w.get('calories', 0) # Line written by Gemini
+
+        print(f"\nWorkout {i}") 
+        print(f"Start: {start}") 
+        print(f"End: {end}") 
+        print(f"Distance: {dist} miles") 
+        print(f"Steps: {steps:,}") 
+        print(f"Calories: {cals}") 
+        print("------------------------------") 
+
+    return None
     
     # Render the component using the HTML file in custom_components/
     create_component(data, "display_activity_summary") 
