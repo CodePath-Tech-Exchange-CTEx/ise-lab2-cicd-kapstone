@@ -16,50 +16,59 @@ userId = 'user1'
 def display_app_page():
     """Displays the home page of the app."""
     st.title('Welcome to SDS!')
-
-    # An example of displaying a custom component called "my_custom_component"
-    value = st.text_input('Enter your name')
-    display_my_custom_component(value)
-
     st.write("---")
     st.header("Your Fitness Dashboard")
 
-    # Fetch the workout list from the data fetcher
-    # 'or []' means: if get_user_workouts returns None, use empty list instead
+    # Fetch workouts
     workouts = get_user_workouts(userId) or []
 
-    # Requirement: Display Activity Summary
+    # Activity Summary
     display_activity_summary(workouts)
-
     st.write("---")
 
-    # Requirement: Display Recent Workouts  <-- YOUR SECTION
+    # Recent Workouts
     st.subheader("Recent Sessions")
     display_recent_workouts(workouts)
-
     st.write("---")
 
-    # Display GenAI advice
+    # GenAI advice
     advice = get_genai_advice(userId)
     if advice:
         display_genai_advice(advice['timestamp'], advice['content'], advice['image'])
-
     st.write("---")
 
-    # Display post
-    username = st.text_input("Enter username")
-    user_image = st.file_uploader("profile image", type=["jpg", "jpeg", "png"])
-    content = st.text_area("workout description")
-    post_image = st.file_uploader("workout image", type=["jpg", "jpeg", "png"])
-    if st.button("Post"):
+    # Display posts form
+    with st.form("post_form"):
+        username = st.text_input("Enter username")
+        user_image = st.file_uploader("profile image", type=["jpg", "jpeg", "png"])
+        content = st.text_area("workout description")
+        post_image = st.file_uploader("workout image", type=["jpg", "jpeg", "png"])
+        submitted = st.form_submit_button("Post")
+
+    if submitted:
         if username == "":
             st.warning("please enter username")
         elif len(content) > 280 or len(content) < 1:
             st.warning("description must be between 1 and 280 characters")
         else:
-            display_post(username, user_image, datetime.now(), content, post_image)
+            post = {
+                "username": username,
+                "user_image_bytes": read_bytes(user_image),
+                "timestamp": datetime.now(),
+                "content": content,
+                "post_image_bytes": read_bytes(post_image),
+            }
+            st.session_state["posts"].append(post)
 
-
+    for p in reversed(st.session_state["posts"]):
+        display_post(
+            p["username"],
+            p["user_image_bytes"],
+            p["timestamp"],
+            p["content"],
+            p["post_image_bytes"],
+        )
+        
 # This is the starting point for your app. You do not need to change these lines
 if __name__ == '__main__':
     display_app_page()

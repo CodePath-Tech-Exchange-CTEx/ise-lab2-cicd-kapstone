@@ -178,5 +178,5 @@ def display_genai_advice(timestamp, content, image):
         st.write(content)
 
     with col2:
-        st.image(image, caption="Stay Motivated!", use_column_width=True)
-    pass
+        if image:
+            st.image(image, caption="Stay Motivated!", use_container_width=True)

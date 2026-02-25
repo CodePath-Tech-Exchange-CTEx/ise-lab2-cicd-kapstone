@@ -11,7 +11,7 @@ import streamlit.components.v1 as components
 
 def load_html_file(file_path):
     # Read an html file
-    with open(file_path, 'r') as file:
+    with open(file_path, 'r', encoding='utf-8') as file:
         return file.read()
 
 
