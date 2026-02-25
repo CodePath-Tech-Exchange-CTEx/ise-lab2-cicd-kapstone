@@ -13,7 +13,25 @@ from data_fetcher import get_user_posts, get_genai_advice, get_user_profile, get
 userId = 'user1'
 
 
+if "posts" not in st.session_state:
+    st.session_state["posts"] = []
+
+def read_bytes(uploaded):
+    return uploaded.read() if uploaded is not None else None
+
 def display_app_page():
+
+
+
+    #display posts
+    with st.form("post_form"):
+        username = st.text_input("Enter username")
+        user_image = st.file_uploader("profile image", type=["jpg", "jpeg", "png"])
+        content = st.text_area("workout description")
+        post_image = st.file_uploader("workout image", type=["jpg", "jpeg", "png"])
+        submitted = st.form_submit_button("Post")
+
+    if submitted:
     """Displays the home page of the app."""
     st.title('Welcome to SDS!')
 
@@ -57,9 +75,28 @@ def display_app_page():
         elif len(content) > 280 or len(content) < 1:
             st.warning("description must be between 1 and 280 characters")
         else:
+            post = {
+                "username": username,
+                "user_image_bytes": read_bytes(user_image),
+                "timestamp": datetime.now(),
+                "content": content,
+                "post_image_bytes": read_bytes(post_image),
+            }
+            st.session_state["posts"].append(post)
+
+    for p in reversed(st.session_state["posts"]):
+        display_post(
+            p["username"],
+            p["user_image_bytes"],
+            p["timestamp"],
+            p["content"],
+            p["post_image_bytes"],
+        )
+
             display_post(username, user_image, datetime.now(), content, post_image)
 
 
+        
 # This is the starting point for your app. You do not need to change these lines
 if __name__ == '__main__':
     display_app_page()
