@@ -30,40 +30,38 @@ def display_app_page():
     workouts = get_user_workouts(userId) or []
 
     # Activity Summary
-    current_posts = st.session_state.get('posts', [])
-
     workouts = st.session_state.get('posts', [])
-
+    
     total_miles = 0.0
-    total_calories = 0
     total_steps = 0
+    total_calories = 0
 
-    #Line written by gemini
     for w in workouts:
-         #Line written by gemini
-        desc = w.get('description', '').lower()
-         #Line written by gemini
+        content = w.get('description') or w.get('text') or ""
+        text = str(content).lower()
+        
         import re
-         #Line written by gemini
-        nums = re.findall(r"[-+]?\d*\.\d+|\d+", desc)
-         #Line written by gemini
+        nums = re.findall(r"(\d+\.?\d*)", text)
         
         if nums:
             val = float(nums[0])
-            if "mile" in desc:
+            
+        
+            if "mile" in text:
                 total_miles += val
-            elif "calor" in desc:
-                total_calories += int(val)
-            elif "step" in desc:
+            if "step" in text:
                 total_steps += int(val)
+            if "calor" in text:
+                total_calories += int(val)
 
     st.markdown("## Activity Summary")
-    t_col1, t_col2 = st.columns(2)
-    t_col3, t_col4 = st.columns(2)  
-    t_col1.metric("Total Workouts", len(workouts))
-    t_col2.metric("Total Distance", f"{total_miles} miles")
-    t_col3.metric("Total Steps", f"{total_steps}")
-    t_col4.metric("Total Calories", f"{total_calories}")
+    c1, c2 = st.columns(2)
+    c3, c4 = st.columns(2)
+    
+    c1.metric("Total Workouts", len(workouts))
+    c2.metric("Total Distance", f"{total_miles} miles")
+    c3.metric("Total Steps", f"{total_steps}")
+    c4.metric("Total Calories", f"{total_calories}")
 
     # Recent Workouts
     st.subheader("Recent Sessions")
