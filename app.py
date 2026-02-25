@@ -31,29 +31,34 @@ def display_app_page():
 
     # Activity Summary
     display_activity_summary(workouts)
+    workouts = st.session_state.get("posts", [])
+
     total_workouts = len(workouts)
-    total_dist = 0.0
+    total_dist = 0
     total_steps = 0
     total_cals = 0
 
-    for w in workouts:
-         text = w.get('content', w.get('description', '')).lower()
-    
-    d = re.search(r'(\d+\.?\d*)\s*(mi|mile)', text)
-    s = re.search(r'(\d+)\s*step', text)
-    c = re.search(r'(\d+)\s*(cal|burned)', text)
-    
-    if d: total_dist += float(d.group(1))
-    if s: total_steps += int(s.group(1))
-    if c: total_cals += int(c.group(1)) 
+for w in workouts:
+    content = w.get("content", "")
+
+    for word in content.split():
+        if word.isdigit():
+            num = int(word)
+            if "mile" in content.lower() or "mi" in content.lower():
+                total_dist += num
+            if "step" in content.lower():
+                total_steps += num
+            if "cal" in content.lower():
+                total_cals += num
+
 
     col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total Workouts", total_workouts)
     col2.metric("Total Distance", f"{total_dist} miles")
-    col3.metric("Total Steps", f"{total_steps:,}")
-    col4.metric("Total Calories", f"{total_cals:,}")
+    col3.metric("Total Steps", total_steps)
+    col4.metric("Total Calories", total_cals)
 
-    st.write("---")
+ 
 
     # Recent Workouts
     st.subheader("Recent Sessions")
