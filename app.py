@@ -30,10 +30,8 @@ def display_app_page():
     workouts = get_user_workouts(userId) or []
 
     # Activity Summary
-    # --- Activity Summary Header ---
     st.markdown("## Activity Summary")
     
-    st.write("### Totals Summary")
     t_col1, t_col2 = st.columns(2)
     t_col3, t_col4 = st.columns(2)
     t_col1.metric("Total Workouts", "0")
@@ -41,18 +39,10 @@ def display_app_page():
     t_col3.metric("Total Steps", "0")
     t_col4.metric("Total Calories", "0")
     
-    st.divider()   # Line written by gemini 
+    st.divider() 
 
-    st.write("### Recent Workouts")   # Line written by gemini 
-    
     if not workouts:
-        st.info("No workouts logged yet. Your history will appear here!")
-        
-        with st.expander("Example Workout"): 
-            # Line written by gemini 
-            st.write("**Time:** --:-- AM to --:-- AM")
-            st.write("**Distance:** 0.0 miles")
-            st.write("**Steps:** 0 | **Calories:** 0")
+        st.info("No workouts logged yet.")
     else:
         display_activity_summary(workouts)
 
