@@ -30,25 +30,40 @@ def display_app_page():
     workouts = get_user_workouts(userId) or []
 
     # Activity Summary
-    # 1. Grab the actual data from the app's memory
-    # This looks for 'posts' and uses an empty list if none are found
     current_posts = st.session_state.get('posts', [])
 
-    # 2. Activity Summary Header
-    feed_data = st.session_state.get('posts', [])
+    workouts = st.session_state.get('posts', [])
+
+    total_miles = 0.0
+    total_calories = 0
+    total_steps = 0
+
+    #Line written by gemini
+    for w in workouts:
+         #Line written by gemini
+        desc = w.get('description', '').lower()
+         #Line written by gemini
+        import re
+         #Line written by gemini
+        nums = re.findall(r"[-+]?\d*\.\d+|\d+", desc)
+         #Line written by gemini
+        
+        if nums:
+            val = float(nums[0])
+            if "mile" in desc:
+                total_miles += val
+            elif "calor" in desc:
+                total_calories += int(val)
+            elif "step" in desc:
+                total_steps += int(val)
 
     st.markdown("## Activity Summary")
     t_col1, t_col2 = st.columns(2)
-    t_col3, t_col4 = st.columns(2)
-    t_col1.metric("Total Workouts", len(feed_data))
-    t_col2.metric("Total Distance", "0.0 miles")
-    t_col3.metric("Total Steps", "0")
-    t_col4.metric("Total Calories", "0")
-    
-    if not feed_data:
-        st.info("No workouts logged yet. Your history will appear here!")
-    else:
-        display_activity_summary(feed_data)
+    t_col3, t_col4 = st.columns(2)  
+    t_col1.metric("Total Workouts", len(workouts))
+    t_col2.metric("Total Distance", f"{total_miles} miles")
+    t_col3.metric("Total Steps", f"{total_steps}")
+    t_col4.metric("Total Calories", f"{total_calories}")
 
     # Recent Workouts
     st.subheader("Recent Sessions")
