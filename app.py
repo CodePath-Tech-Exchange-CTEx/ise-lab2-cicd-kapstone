@@ -20,10 +20,30 @@ def read_bytes(uploaded):
     return uploaded.read() if uploaded is not None else None
 
 def display_app_page():
+    """Displays the home page of the app."""
+    st.title('Welcome to SDS!')
+    st.write("---")
+    st.header("Your Fitness Dashboard")
 
+    # Fetch workouts
+    workouts = get_user_workouts(userId) or []
 
+    # Activity Summary
+    display_activity_summary(workouts)
+    st.write("---")
 
-    #display posts
+    # Recent Workouts
+    st.subheader("Recent Sessions")
+    display_recent_workouts(workouts)
+    st.write("---")
+
+    # GenAI advice
+    advice = get_genai_advice(userId)
+    if advice:
+        display_genai_advice(advice['timestamp'], advice['content'], advice['image'])
+    st.write("---")
+
+    # Display posts form
     with st.form("post_form"):
         username = st.text_input("Enter username")
         user_image = st.file_uploader("profile image", type=["jpg", "jpeg", "png"])
@@ -32,44 +52,6 @@ def display_app_page():
         submitted = st.form_submit_button("Post")
 
     if submitted:
-    """Displays the home page of the app."""
-    st.title('Welcome to SDS!')
-
-    # An example of displaying a custom component called "my_custom_component"
-    value = st.text_input('Enter your name')
-    display_my_custom_component(value)
-
-    st.write("---")
-    st.header("Your Fitness Dashboard")
-
-    # Fetch the workout list from the data fetcher
-    # 'or []' means: if get_user_workouts returns None, use empty list instead
-    workouts = get_user_workouts(userId) or []
-
-    # Requirement: Display Activity Summary
-    display_activity_summary(workouts)
-
-    st.write("---")
-
-    # Requirement: Display Recent Workouts  <-- YOUR SECTION
-    st.subheader("Recent Sessions")
-    display_recent_workouts(workouts)
-
-    st.write("---")
-
-    # Display GenAI advice
-    advice = get_genai_advice(userId)
-    if advice:
-        display_genai_advice(advice['timestamp'], advice['content'], advice['image'])
-
-    st.write("---")
-
-    # Display post
-    username = st.text_input("Enter username")
-    user_image = st.file_uploader("profile image", type=["jpg", "jpeg", "png"])
-    content = st.text_area("workout description")
-    post_image = st.file_uploader("workout image", type=["jpg", "jpeg", "png"])
-    if st.button("Post"):
         if username == "":
             st.warning("please enter username")
         elif len(content) > 280 or len(content) < 1:
@@ -92,10 +74,6 @@ def display_app_page():
             p["content"],
             p["post_image_bytes"],
         )
-
-            display_post(username, user_image, datetime.now(), content, post_image)
-
-
         
 # This is the starting point for your app. You do not need to change these lines
 if __name__ == '__main__':

@@ -22,8 +22,8 @@ class TestDisplayPost(unittest.TestCase):
         at.text_input[0].set_value("testuser")
         at.text_area[0].set_value("testcontent")
         at.button[0].click().run()
-        self.assertEqual(at.markdown[0].value, "testuser")
-        self.assertEqual(at.markdown[1].value, "testcontent")
+        self.assertEqual(at.markdown[6].value, "testuser")
+        self.assertEqual(at.markdown[7].value, "testcontent")
         self.assertIsNotNone(at.caption[0].value)
 
     def test_no_username(self):
