@@ -30,38 +30,30 @@ def display_app_page():
     workouts = get_user_workouts(userId) or []
 
     # Activity Summary
-    workouts = st.session_state.get('posts', [])
-    
-    total_miles = 0.0
+    display_activity_summary(workouts)
+    total_workouts = len(workouts)
+    total_dist = 0.0
     total_steps = 0
-    total_calories = 0
+    total_cals = 0
 
     for w in workouts:
-        content = w.get('description') or w.get('text') or ""
-        text = str(content).lower()
-        
-        import re
-        nums = re.findall(r"(\d+\.?\d*)", text)
-        
-        if nums:
-            val = float(nums[0])
-            
-        
-            if "mile" in text:
-                total_miles += val
-            if "step" in text:
-                total_steps += int(val)
-            if "calor" in text:
-                total_calories += int(val)
-
-    st.markdown("## Activity Summary")
-    c1, c2 = st.columns(2)
-    c3, c4 = st.columns(2)
+         text = w.get('content', w.get('description', '')).lower()
     
-    c1.metric("Total Workouts", len(workouts))
-    c2.metric("Total Distance", f"{total_miles} miles")
-    c3.metric("Total Steps", f"{total_steps}")
-    c4.metric("Total Calories", f"{total_calories}")
+    d = re.search(r'(\d+\.?\d*)\s*(mi|mile)', text)
+    s = re.search(r'(\d+)\s*step', text)
+    c = re.search(r'(\d+)\s*(cal|burned)', text)
+    
+    if d: total_dist += float(d.group(1))
+    if s: total_steps += int(s.group(1))
+    if c: total_cals += int(c.group(1)) 
+
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Total Workouts", total_workouts)
+    col2.metric("Total Distance", f"{total_dist} miles")
+    col3.metric("Total Steps", f"{total_steps:,}")
+    col4.metric("Total Calories", f"{total_cals:,}")
+
+    st.write("---")
 
     # Recent Workouts
     st.subheader("Recent Sessions")
