@@ -19,7 +19,7 @@ class TestDisplayPost(unittest.TestCase):
     def test_post_without_image(self):
         at = AppTest.from_file("app.py")
         at.run()
-        at.text_input[1].set_value("testuser")
+        at.text_input[0].set_value("testuser")
         at.text_area[0].set_value("testcontent")
         at.button[0].click().run()
         self.assertEqual(at.markdown[6].value, "testuser")
@@ -34,14 +34,14 @@ class TestDisplayPost(unittest.TestCase):
     def test_content_too_long(self):
         at = AppTest.from_file("app.py")
         at.run()
-        at.text_input[1].set_value("testuser")
+        at.text_input[0].set_value("testuser")
         at.text_area[0].set_value("a" * 281)
         at.button[0].click().run()
         self.assertEqual(at.warning[0].value,"description must be between 1 and 280 characters")
     def test_no_content(self):
         at = AppTest.from_file("app.py")
         at.run()
-        at.text_input[1].set_value("testuser")
+        at.text_input[0].set_value("testuser")
         at.button[0].click().run()
         self.assertEqual(at.warning[0].value,"description must be between 1 and 280 characters")
 
