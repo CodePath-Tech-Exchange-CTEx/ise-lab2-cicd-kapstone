@@ -112,20 +112,46 @@ class TestDisplayGenAiAdvice(unittest.TestCase):
 
 
 class TestDisplayRecentWorkouts(unittest.TestCase):
-    """Tests the display_recent_workouts function."""
+    """Tests for display_recent_workouts()"""
 
-    def test_display_recent_workouts_runs(self):
-        """Tests if the function processes a list of workouts without crashing."""
-        sample_data = [
-            {'distance': 3.5, 'steps': 4500, 'calories': 250},
-            {'distance': 1.2, 'steps': 1500, 'calories': 80}
+    @patch("modules.st")
+    def test_empty_list_shows_info(self, mock_st):
+        """Empty list should show an info message and stop early."""
+        from modules import display_recent_workouts
+        display_recent_workouts([])
+        mock_st.info.assert_called_once()  # checks st.info() was called
+
+    @patch("modules.create_component")
+    def test_single_workout_creates_component(self, mock_create):
+        """A single workout should call create_component once."""
+        from modules import display_recent_workouts
+        workouts = [
+            {'start_time': '9am', 'end_time': '10am',
+             'distance': 3, 'steps': 4000, 'calories': 250}
         ]
-        try:
-            display_recent_workouts(sample_data)
-            success = True
-        except Exception:
-            success = False
-        self.assertTrue(success, "Function failed to process workout list")
+        display_recent_workouts(workouts)
+        mock_create.assert_called_once()  # checks create_component was called
+
+    @patch("modules.create_component")
+    def test_workout_data_appears_in_html(self, mock_create):
+        """The distance value should appear somewhere in the generated HTML."""
+        from modules import display_recent_workouts
+        workouts = [
+            {'distance': 5, 'steps': 6000, 'calories': 300}
+        ]
+        display_recent_workouts(workouts)
+
+        # Get what was passed to create_component
+        passed_data = mock_create.call_args[0][0]  # first argument = the data dict
+        self.assertIn('WORKOUT_CARDS', passed_data)
+        self.assertIn('5', passed_data['WORKOUT_CARDS'])  # distance shows up
+
+    @patch("modules.create_component")
+    def test_missing_fields_default_to_zero(self, mock_create):
+        """Workouts with missing keys should not crash."""
+        from modules import display_recent_workouts
+        display_recent_workouts([{}])  # completely empty workout dict
+        mock_create.assert_called_once()
 
 
 if __name__ == "__main__":
