@@ -37,11 +37,13 @@ def display_app_page():
     t_col2.metric("Total Distance", "0.0 miles")
     t_col3.metric("Total Steps", "0")
     t_col4.metric("Total Calories", "0")
-   
-    if not posts:
+    
+    display_posts = st.session_state.get('posts', [])
+
+    if not display_posts:
         st.info("No workouts logged yet. Your history will appear here!")
     else:
-        display_activity_summary(posts)
+        display_activity_summary(display_posts)
 
     # Recent Workouts
     st.subheader("Recent Sessions")
