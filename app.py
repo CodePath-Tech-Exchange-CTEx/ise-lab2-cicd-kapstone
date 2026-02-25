@@ -13,14 +13,15 @@ from data_fetcher import get_user_posts, get_genai_advice, get_user_profile, get
 userId = 'user1'
 
 
-if "posts" not in st.session_state:
-    st.session_state["posts"] = []
+
 
 def read_bytes(uploaded):
     return uploaded.read() if uploaded is not None else None
 
 def display_app_page():
     """Displays the home page of the app."""
+    if "posts" not in st.session_state:
+        st.session_state["posts"] = []
     st.title('Welcome to SDS!')
     st.write("---")
     st.header("Your Fitness Dashboard")
