@@ -179,4 +179,4 @@ def display_genai_advice(timestamp, content, image):
 
     with col2:
         if image:
-            st.image(image, caption="Stay Motivated!", use_container_width=True)
+            st.image(image, caption="Stay Motivated!", width='stretch')
