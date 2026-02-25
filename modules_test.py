@@ -8,6 +8,7 @@
 
 import unittest
 from streamlit.testing.v1 import AppTest
+from unittest.mock import patch
 from modules import display_post, display_activity_summary, display_genai_advice, display_recent_workouts
 
 
