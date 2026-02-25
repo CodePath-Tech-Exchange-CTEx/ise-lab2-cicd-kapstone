@@ -30,33 +30,53 @@ def display_app_page():
     workouts = get_user_workouts(userId) or []
 
     # Activity Summary
-    display_activity_summary(workouts)
-    workouts = st.session_state.get("posts", [])
+    if "workouts" not in st.session_state:
+        st.session_state.workouts = []
 
-    total_workouts = len(workouts)
-    total_dist = 0
-    total_steps = 0
-    total_cals = 0
+if st.button("Post"):
+    workout_text = workout_description  
 
-for w in workouts:
-    content = w.get("content", "")
+    miles_match = re.search(r"(\d+(\.\d+)?)\s*miles?", workout_text, re.IGNORECASE)
+    steps_match = re.search(r"(\d+)\s*steps?", workout_text, re.IGNORECASE)
+    calories_match = re.search(r"(\d+)\s*calories?", workout_text, re.IGNORECASE)
 
-    for word in content.split():
-        if word.isdigit():
-            num = int(word)
-            if "mile" in content.lower() or "mi" in content.lower():
-                total_dist += num
-            if "step" in content.lower():
-                total_steps += num
-            if "cal" in content.lower():
-                total_cals += num
+    miles = float(miles_match.group(1)) if miles_match else 0
+    steps = int(steps_match.group(1)) if steps_match else 0
+    calories = int(calories_match.group(1)) if calories_match else 0
+
+    st.session_state.workouts.append({
+        "miles": miles,
+        "steps": steps,
+        "calories": calories,
+        "description": workout_text
+    })
 
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total Workouts", total_workouts)
-    col2.metric("Total Distance", f"{total_dist} miles")
-    col3.metric("Total Steps", total_steps)
-    col4.metric("Total Calories", total_cals)
+workouts = st.session_state.workouts
+
+total_workouts = len(workouts)
+total_distance = sum(w.get("miles", 0) for w in workouts)
+total_steps = sum(w.get("steps", 0) for w in workouts)
+total_calories = sum(w.get("calories", 0) for w in workouts)
+
+st.subheader("Activity Summary")
+col1, col2 = st.columns(2)
+with col1:
+    st.metric("Total Workouts", total_workouts)
+    st.metric("Total Steps", total_steps)
+with col2:
+    st.metric("Total Distance", f"{total_distance:.1f} miles")
+    st.metric("Total Calories", total_calories)
+
+st.subheader("Recent Sessions")
+if workouts:
+    for i, w in enumerate(reversed(workouts[-5:]), 1):  # show last 5 sessions
+        st.write(f"{i}. {w['description']} — {w.get('miles', 0)} miles, {w.get('steps',0)} steps, {w.get('calories',0)} calories")
+else:
+    st.write("No recent workouts to show.")
+
+    st.write("---")
+
 
  
 
