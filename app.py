@@ -30,20 +30,19 @@ def display_app_page():
     workouts = get_user_workouts(userId) or []
 
     # Activity Summary
+    all_data = st.session_state.get('posts', [])
     st.markdown("## Activity Summary")
     t_col1, t_col2 = st.columns(2)
     t_col3, t_col4 = st.columns(2)
-    t_col1.metric("Total Workouts", "0")
+    t_col1.metric("Total Workouts", len(all_data))
     t_col2.metric("Total Distance", "0.0 miles")
     t_col3.metric("Total Steps", "0")
     t_col4.metric("Total Calories", "0")
     
-    display_posts = st.session_state.get('posts', [])
-
-    if not display_posts:
+    if not all_data:
         st.info("No workouts logged yet. Your history will appear here!")
     else:
-        display_activity_summary(display_posts)
+        display_activity_summary(all_data)
 
     # Recent Workouts
     st.subheader("Recent Sessions")
