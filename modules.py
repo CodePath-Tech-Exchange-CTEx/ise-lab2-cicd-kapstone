@@ -18,9 +18,14 @@ def display_my_custom_component(value):
 
     value: the name you'd like to be called by within the app
     """
+    # Define any templated data from your HTML file. The contents of
+    # 'value' will be inserted to the templated HTML file wherever '{{NAME}}'
+    # occurs. You can add as many variables as you want.
     data = {
         'NAME': value,
     }
+    # Register and display the component by providing the data and name
+    # of the HTML file. HTML must be placed inside the "custom_components" folder.
     html_file_name = "my_custom_component"
     create_component(data, html_file_name)
 
@@ -39,38 +44,68 @@ def display_post(username, user_image, timestamp, content, post_image):
     Returns:
         Nothing
     """
+
     col1, col2 = st.columns(2)
     with col1:
-        if user_image is not None:
+        if user_image:
             st.image(user_image, width=50)
     with col2:
         st.write(username)
-    if post_image is not None:
-        st.image(post_image, width="stretch")
+    if post_image:
+        st.image(post_image)
     st.write(content)
     st.caption(timestamp.strftime("%B %d, %Y at %I:%M %p"))
 
+
 def display_activity_summary(workouts_list):
-    """
-    Displays a summary of total activity statistics across all workouts.
+    if not workouts_list: 
+        print("No workouts recorded.") 
+        return None 
 
-    Args:
-        workouts_list: A list of dictionaries containing workout metrics.
-    """
-    total_distance = sum(w.get('distance', 0) for w in workouts_list)
+    
+    total_dist = sum(w.get('distance', 0) for w in workouts_list) 
+    # Line written by Gemini
     total_steps = sum(w.get('steps', 0) for w in workouts_list)
-    total_calories = sum(w.get('calories', 0) for w in workouts_list)
+     # Line written by Gemini
+    total_cals = sum(w.get('calories', 0) for w in workouts_list) 
+    # Line written by Gemini
 
-    total_distance = round(total_distance, 1)
+    # Header section 
+    print("\n      Activity Summary")
+    print("==============================") 
+    print("\nTotals Summary") 
+    # Change 'workouts' to 'workouts_list' here too
+    print(f"Total Workouts: {len(workouts_list)}") 
+    print(f"Total Distance: {total_dist:.1f} miles") 
+    print(f"Total Steps: {total_steps:,}") 
+    print(f"Total Calories: {total_cals}") 
+    print("------------------------------") 
 
-    data = {
-        'TOTAL_DISTANCE': str(total_distance),
-        'TOTAL_STEPS': str(total_steps),
-        'TOTAL_CALORIES': str(total_calories),
-        'NUM_WORKOUTS': len(workouts_list)
-    }
+    for i, w in enumerate(workouts_list, 1): 
+        # Line written by Gemini
+        start = w.get('start_time', 'None') 
+        # Line written by Gemini
+        end = w.get('end_time', 'None') 
+        # Line written by Gemini
+        dist = w.get('distance', 0) 
+        # Line written by Gemini
+        steps = w.get('steps', 0) 
+        # Line written by Gemini
+        cals = w.get('calories', 0) 
+        # Line written by Gemini
 
-    create_component(data, "display_activity_summary")
+        print(f"\nWorkout {i}") 
+        print(f"Start: {start}") 
+        print(f"End: {end}") 
+        print(f"Distance: {dist} miles") 
+        print(f"Steps: {steps:,}") 
+        print(f"Calories: {cals}") 
+        print("------------------------------") 
+
+    return None
+    
+    # Render the component using the HTML file in custom_components/
+    create_component(workouts_list, "display_activity_summary") 
 
 
 def display_recent_workouts(workouts_list=[]):
@@ -130,17 +165,9 @@ def display_recent_workouts(workouts_list=[]):
 
 
 def display_genai_advice(timestamp, content, image):
-    """
-    Displays GenAI-created advice including a timestamp, advice content, and motivational image.
+    def display_genai_advice(timestamp, content, image):
+        import streamlit as st
 
-    Args:
-        timestamp: when the advice was generated
-        content (str): the AI-generated advice text
-        image: a motivational image to display alongside the advice
-
-    Returns:
-        None
-    """
     st.subheader("💡 AI-Powered Advice")
     st.caption(f"Generated on: {timestamp}")
 
