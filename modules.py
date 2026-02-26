@@ -61,26 +61,38 @@ def display_post(username, user_image, timestamp, content, post_image):
 def display_activity_summary(workouts_list):
     if not workouts_list:
         st.write("No workouts recorded.")
-        return None 
+        return None
 
-    
+    # Logic remains exactly the same
     total_dist = sum(w.get('distance', 0) for w in workouts_list)
     total_steps = sum(w.get('steps', 0) for w in workouts_list)
     total_cals = sum(w.get('calories', 0) for w in workouts_list)
 
-   
+    # Header section - Now using st.write to show on the website
     st.header("Activity Summary")
-    st.write(f"Total Workouts: {len(workouts_list)}")
-    st.write(f"Total Distance: {total_dist:.1f} miles")
-    st.write(f"Total Steps: {total_steps:,}")
-    st.write(f"Total Calories: {total_cals}")
+    st.write("==============================")
+    st.subheader("Totals Summary")
+    
+    st.write(f"**Total Workouts:** {len(workouts_list)}")
+    st.write(f"**Total Distance:** {total_dist:.1f} miles")
+    st.write(f"**Total Steps:** {total_steps:,}")
+    st.write(f"**Total Calories:** {total_cals}")
+    st.write("------------------------------")
 
-   
+    # The loop to show individual workouts
     for i, w in enumerate(workouts_list, 1):
-        # We use .get() to match the keys in your mockup_data
+        start = w.get('start_time', 'None')
+        end = w.get('end_time', 'None')
         dist = w.get('distance', 0)
         steps = w.get('steps', 0)
-        st.write(f"Workout {i}: {dist} miles, {steps} steps")
+        cals = w.get('calories', 0)
+
+        st.write(f"### Workout {i}")
+        st.write(f"**Start:** {start} | **End:** {end}")
+        st.write(f"**Distance:** {dist} miles")
+        st.write(f"**Steps:** {steps:,}")
+        st.write(f"**Calories:** {cals}")
+        st.write("------------------------------")
 
     return None
     
@@ -110,7 +122,7 @@ def display_recent_workouts(workouts_list=[]):
     if not workouts_list: 
    
     # Step A: Loop through workouts and build one big HTML string
-        cards_html = ""  # start with empty string
+            cards_html = ""  # start with empty string
 
     for i, workout in enumerate(workouts_list, start=1):
         # Safely get each value, defaulting if missing
