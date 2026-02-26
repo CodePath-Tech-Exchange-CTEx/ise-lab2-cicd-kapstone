@@ -97,7 +97,6 @@ def display_activity_summary(workouts_list):
     return None
     
     # Render the component using the HTML file in custom_components/
-    create_component(workouts_list, "display_activity_summary") 
 
 
 def display_recent_workouts(workouts_list=[]):
@@ -119,10 +118,10 @@ def display_recent_workouts(workouts_list=[]):
         st.info("No recent workouts to show.")
         return
 
-    if not workouts_list: 
+
    
     # Step A: Loop through workouts and build one big HTML string
-            cards_html = ""  # start with empty string
+    cards_html = ""  # start with empty string
 
     for i, workout in enumerate(workouts_list, start=1):
         # Safely get each value, defaulting if missing
@@ -159,8 +158,6 @@ def display_recent_workouts(workouts_list=[]):
 
 
 def display_genai_advice(timestamp, content, image):
-    def display_genai_advice(timestamp, content, image):
-        import streamlit as st
 
     st.subheader("💡 AI-Powered Advice")
     st.caption(f"Generated on: {timestamp}")
