@@ -57,50 +57,30 @@ def display_post(username, user_image, timestamp, content, post_image):
     st.caption(timestamp.strftime("%B %d, %Y at %I:%M %p"))
 
 
+    
 def display_activity_summary(workouts_list):
-    if not workouts_list: 
-        print("No workouts recorded.") 
+    if not workouts_list:
+        st.write("No workouts recorded.")
         return None 
 
     
-    total_dist = sum(w.get('distance', 0) for w in workouts_list) 
-    # Line written by Gemini
+    total_dist = sum(w.get('distance', 0) for w in workouts_list)
     total_steps = sum(w.get('steps', 0) for w in workouts_list)
-     # Line written by Gemini
-    total_cals = sum(w.get('calories', 0) for w in workouts_list) 
-    # Line written by Gemini
+    total_cals = sum(w.get('calories', 0) for w in workouts_list)
 
-    # Header section 
-    print("\n      Activity Summary")
-    print("==============================") 
-    print("\nTotals Summary") 
-    # Change 'workouts' to 'workouts_list' here too
-    print(f"Total Workouts: {len(workouts_list)}") 
-    print(f"Total Distance: {total_dist:.1f} miles") 
-    print(f"Total Steps: {total_steps:,}") 
-    print(f"Total Calories: {total_cals}") 
-    print("------------------------------") 
+   
+    st.header("Activity Summary")
+    st.write(f"Total Workouts: {len(workouts_list)}")
+    st.write(f"Total Distance: {total_dist:.1f} miles")
+    st.write(f"Total Steps: {total_steps:,}")
+    st.write(f"Total Calories: {total_cals}")
 
-    for i, w in enumerate(workouts_list, 1): 
-        # Line written by Gemini
-        start = w.get('start_time', 'None') 
-        # Line written by Gemini
-        end = w.get('end_time', 'None') 
-        # Line written by Gemini
-        dist = w.get('distance', 0) 
-        # Line written by Gemini
-        steps = w.get('steps', 0) 
-        # Line written by Gemini
-        cals = w.get('calories', 0) 
-        # Line written by Gemini
-
-        print(f"\nWorkout {i}") 
-        print(f"Start: {start}") 
-        print(f"End: {end}") 
-        print(f"Distance: {dist} miles") 
-        print(f"Steps: {steps:,}") 
-        print(f"Calories: {cals}") 
-        print("------------------------------") 
+   
+    for i, w in enumerate(workouts_list, 1):
+        # We use .get() to match the keys in your mockup_data
+        dist = w.get('distance', 0)
+        steps = w.get('steps', 0)
+        st.write(f"Workout {i}: {dist} miles, {steps} steps")
 
     return None
     
@@ -127,8 +107,10 @@ def display_recent_workouts(workouts_list=[]):
         st.info("No recent workouts to show.")
         return
 
+    if not workouts_list: 
+   
     # Step A: Loop through workouts and build one big HTML string
-    cards_html = ""  # start with empty string
+        cards_html = ""  # start with empty string
 
     for i, workout in enumerate(workouts_list, start=1):
         # Safely get each value, defaulting if missing
