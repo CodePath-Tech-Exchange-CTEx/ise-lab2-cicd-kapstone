@@ -42,58 +42,119 @@ users = {
 }
 
 
-def get_user_sensor_data(user_id, workout_id):
-    """Returns a list of timestampped information for a given workout.
-
-    This function currently returns random data. You will re-write it in Unit 3.
-    """
-    sensor_data = []
-    sensor_types = [
-        'accelerometer',
-        'gyroscope',
-        'pressure',
-        'temperature',
-        'heart_rate',
-    ]
-    for index in range(random.randint(5, 100)):
-        random_minute = str(random.randint(0, 59))
-        if len(random_minute) == 1:
-            random_minute = '0' + random_minute
-        timestamp = '2024-01-01 00:' + random_minute + ':00'
-        data = random.random() * 100
-        sensor_type = random.choice(sensor_types)
-        sensor_data.append(
-            {'sensor_type': sensor_type, 'timestamp': timestamp, 'data': data}
-        )
-    return sensor_data
-
-
 def get_user_workouts(user_id):
-    """Returns a list of user's workouts.
+    """Returns a list of workouts for the given user.
 
-    This function currently returns random data. You will re-write it in Unit 3.
+    Searches through the workouts table and returns all workouts
+    that belong to the given user_id. Handles missing/null fields gracefully.
+
+    Returns a list of dicts with keys:
+        workout_id, start_timestamp, end_timestamp,
+        start_lat_lng, end_lat_lng, distance, steps, calories_burned
     """
-    workouts = []
-    for index in range(random.randint(1, 3)):
-        random_lat_lng_1 = (
-            1 + random.randint(0, 100) / 100,
-            4 + random.randint(0, 100) / 100,
-        )
-        random_lat_lng_2 = (
-            1 + random.randint(0, 100) / 100,
-            4 + random.randint(0, 100) / 100,
-        )
-        workouts.append({
-            'workout_id': f'workout{index}',
-            'start_timestamp': '2024-01-01 00:00:00',
-            'end_timestamp': '2024-01-01 00:30:00',
-            'start_lat_lng': random_lat_lng_1,
-            'end_lat_lng': random_lat_lng_2,
-            'distance': random.randint(0, 200) / 10.0,
-            'steps': random.randint(0, 20000),
-            'calories_burned': random.randint(0, 100),
-        })
-    return workouts
+    # This is our "table" of all workouts across all users
+    workouts_table = [
+        {
+            'user_id': 'user1',
+            'workout_id': 'workout1',
+            'start_timestamp': '2024-01-01 07:00:00',
+            'end_timestamp': '2024-01-01 07:30:00',
+            'start_lat_lng': (36.166, -86.783),
+            'end_lat_lng': (36.170, -86.780),
+            'distance': 2.5,
+            'steps': 4000,
+            'calories_burned': 220,
+        },
+        {
+            'user_id': 'user1',
+            'workout_id': 'workout2',
+            'start_timestamp': '2024-01-02 08:00:00',
+            'end_timestamp': '2024-01-02 08:45:00',
+            'start_lat_lng': (36.166, -86.783),
+            'end_lat_lng': (36.175, -86.790),
+            'distance': None,       # sometimes distance is not recorded
+            'steps': 5200,
+            'calories_burned': 300,
+        },
+        {
+            'user_id': 'user2',
+            'workout_id': 'workout3',
+            'start_timestamp': '2024-01-03 06:30:00',
+            'end_timestamp': '2024-01-03 07:00:00',
+            'start_lat_lng': None,  # sometimes location is not recorded
+            'end_lat_lng': None,
+            'distance': 1.8,
+            'steps': 2800,
+            'calories_burned': 150,
+        },
+    ]
+
+    result = []
+
+    # Loop through every workout, only keep ones matching this user
+    for workout in workouts_table:
+        if workout['user_id'] == user_id:
+            result.append({
+                'workout_id': workout.get('workout_id'),
+                'start_timestamp': workout.get('start_timestamp'),
+                'end_timestamp': workout.get('end_timestamp'),
+                'start_lat_lng': workout.get('start_lat_lng'),
+                'end_lat_lng': workout.get('end_lat_lng'),
+                'distance': workout.get('distance'),
+                'steps': workout.get('steps'),
+                'calories_burned': workout.get('calories_burned'),
+            })
+
+    return result
+
+
+def get_user_sensor_data(user_id, workout_id):
+    """Returns sensor data for a given workout.
+
+    user_id is accepted for compatibility but filtering is done
+    by workout_id since workout_ids are unique per user.
+
+    Returns a list of dicts with keys:
+        sensor_type, timestamp, data, units
+    """
+    # This is our "table" of all sensor readings across all workouts
+    sensor_data_table = [
+        {
+            'workout_id': 'workout1',
+            'sensor_type': 'heart_rate',
+            'timestamp': '2024-01-01 07:05:00',
+            'data': 120,
+            'units': 'bpm',
+        },
+        {
+            'workout_id': 'workout1',
+            'sensor_type': 'accelerometer',
+            'timestamp': '2024-01-01 07:10:00',
+            'data': 9.8,
+            'units': 'm/s^2',
+        },
+        {
+            'workout_id': 'workout2',
+            'sensor_type': 'temperature',
+            'timestamp': '2024-01-02 08:15:00',
+            'data': None,   # sometimes sensor data is missing
+            'units': 'C',
+        },
+    ]
+
+    sensor_data = []
+
+    # Loop through every record, only keep ones matching this workout
+    for record in sensor_data_table:
+        if record['workout_id'] == workout_id:
+            sensor_data.append({
+                'sensor_type': record.get('sensor_type'),
+                'timestamp': record.get('timestamp'),
+                'data': record.get('data'),
+                'units': record.get('units'),
+            })
+
+    return sensor_data
 
 
 def get_user_profile(user_id):

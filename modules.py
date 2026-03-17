@@ -64,9 +64,10 @@ def display_activity_summary(workouts_list):
         return None
 
     # Logic remains exactly the same
-    total_dist = sum(w.get('distance', 0) for w in workouts_list)
-    total_steps = sum(w.get('steps', 0) for w in workouts_list)
-    total_cals = sum(w.get('calories', 0) for w in workouts_list)
+    # FIXED - handles None values properly
+    total_dist = sum(w.get('distance') or 0 for w in workouts_list)
+    total_steps = sum(w.get('steps') or 0 for w in workouts_list)
+    total_cals = sum(w.get('calories') or 0 for w in workouts_list)
 
     # Header section - Now using st.write to show on the website
     st.header("Activity Summary")
@@ -81,8 +82,8 @@ def display_activity_summary(workouts_list):
 
     # The loop to show individual workouts
     for i, w in enumerate(workouts_list, 1):
-        start = w.get('start_time', 'None')
-        end = w.get('end_time', 'None')
+        start = w.get('start_timestamp', 'Unknown')
+        end = w.get('end_timestamp', 'Unknown')
         dist = w.get('distance', 0)
         steps = w.get('steps', 0)
         cals = w.get('calories', 0)
@@ -125,8 +126,8 @@ def display_recent_workouts(workouts_list=[]):
 
     for i, workout in enumerate(workouts_list, start=1):
         # Safely get each value, defaulting if missing
-        start    = workout.get('start_time', 'Unknown')
-        end      = workout.get('end_time', 'Unknown')
+        start = workout.get('start_timestamp', 'Unknown')
+        end   = workout.get('end_timestamp', 'Unknown')
         distance = workout.get('distance', 0)
         steps    = workout.get('steps', 0)
         calories = workout.get('calories', 0)
@@ -170,4 +171,4 @@ def display_genai_advice(timestamp, content, image):
 
     with col2:
         if image:
-            st.image(image, caption="Stay Motivated!", width='stretch')
+            st.image(image, caption="Stay Motivated!", width=300)
