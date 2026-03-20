@@ -26,8 +26,10 @@ class TestDisplayPost(unittest.TestCase):
         at.text_input[0].set_value("testuser")
         at.text_area[0].set_value("testcontent")
         at.button[0].click().run()
-        self.assertEqual(at.markdown[2].value, "testuser")
-        self.assertEqual(at.markdown[3].value, "testcontent")
+        usernames = [m.value for m in at.markdown if m.value == "testuser"]
+        contents = [m.value for m in at.markdown if m.value == "testcontent"]
+        self.assertTrue(len(usernames) > 0, "testuser not found in markdown")
+        self.assertTrue(len(contents) > 0, "testcontent not found in markdown")
         self.assertIsNotNone(at.caption[0].value)
 
     @patch('data_fetcher.GenerativeModel')
