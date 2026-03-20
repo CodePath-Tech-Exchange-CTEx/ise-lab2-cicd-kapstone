@@ -15,36 +15,50 @@ from modules import display_post, display_activity_summary, display_genai_advice
 
 class TestDisplayPost(unittest.TestCase):
     """Tests the display_post function."""
-   
-    def test_post_without_image(self):
+
+    @patch('app.get_genai_advice')
+    def test_post_without_image(self, mock_advice):
+        """Tests that a post renders username and content correctly."""
+        mock_advice.return_value = {'advice_id': 'a1', 'timestamp': '2024-01-01', 'content': 'Keep it up!', 'image': None}
         at = AppTest.from_file("app.py")
         at.run()
-        at.text_input[0].set_value("testuser")
+        at.text_input[1].set_value("testuser")
         at.text_area[0].set_value("testcontent")
         at.button[0].click().run()
-        all_markdown = [m.value for m in at.markdown]
-        self.assertIn("testuser", all_markdown)
-        self.assertIn("testcontent", all_markdown)
+        self.assertEqual(at.markdown[0].value, "testuser")
+        self.assertEqual(at.markdown[1].value, "testcontent")
         self.assertIsNotNone(at.caption[0].value)
-    def test_no_username(self):
+
+    @patch('app.get_genai_advice')
+    def test_no_username(self, mock_advice):
+        """Tests that a warning is shown when no username is entered."""
+        mock_advice.return_value = {'advice_id': 'a1', 'timestamp': '2024-01-01', 'content': 'Keep it up!', 'image': None}
         at = AppTest.from_file("app.py")
         at.run()
         at.text_area[0].set_value("testcontent")
         at.button[0].click().run()
-        self.assertEqual(at.warning[0].value,"please enter username")
-    def test_content_too_long(self):
+        self.assertEqual(at.warning[0].value, "please enter username")
+
+    @patch('app.get_genai_advice')
+    def test_content_too_long(self, mock_advice):
+        """Tests that a warning is shown when content exceeds 280 characters."""
+        mock_advice.return_value = {'advice_id': 'a1', 'timestamp': '2024-01-01', 'content': 'Keep it up!', 'image': None}
         at = AppTest.from_file("app.py")
         at.run()
-        at.text_input[0].set_value("testuser")
+        at.text_input[1].set_value("testuser")
         at.text_area[0].set_value("a" * 281)
         at.button[0].click().run()
-        self.assertEqual(at.warning[0].value,"description must be between 1 and 280 characters")
-    def test_no_content(self):
+        self.assertEqual(at.warning[0].value, "description must be between 1 and 280 characters")
+
+    @patch('app.get_genai_advice')
+    def test_no_content(self, mock_advice):
+        """Tests that a warning is shown when no content is entered."""
+        mock_advice.return_value = {'advice_id': 'a1', 'timestamp': '2024-01-01', 'content': 'Keep it up!', 'image': None}
         at = AppTest.from_file("app.py")
         at.run()
-        at.text_input[0].set_value("testuser")
+        at.text_input[1].set_value("testuser")
         at.button[0].click().run()
-        self.assertEqual(at.warning[0].value,"description must be between 1 and 280 characters")
+        self.assertEqual(at.warning[0].value, "description must be between 1 and 280 characters")
 
 
         
