@@ -8,7 +8,16 @@
 # testing earlier units.
 #############################################################################
 
+import os
 import random
+import uuid
+from datetime import datetime
+from google.cloud import bigquery
+import vertexai
+from vertexai.generative_models import GenerativeModel
+
+project_id = os.environ.get("PROJECT_ID", "johnny-aryeetey-csudh")
+client = bigquery.Client()
 
 users = {
     'user1': {
@@ -186,23 +195,45 @@ def get_user_posts(user_id):
 
 
 def get_genai_advice(user_id):
-    """Returns the most recent advice from the genai model.
-
-    This function currently returns random data. You will re-write it in Unit 3.
+    """Returns advice from the Vertex AI model based on the user's workout data."""
+    query = f"""
+        SELECT WorkoutId, StartTimestamp, EndTimestamp, TotalDistance, TotalSteps, CaloriesBurned
+        FROM `{project_id}.ISE.Workouts`
+        WHERE UserId = @user_id
+        ORDER BY StartTimestamp DESC
+        LIMIT 3
     """
-    advice = random.choice([
-        'Your heart rate indicates you can push yourself further. You got this!',
-        "You're doing great! Keep up the good work.",
-        'You worked hard yesterday, take it easy today.',
-        'You have burned 100 calories so far today!',
-    ])
-    image = random.choice([
-        'https://plus.unsplash.com/premium_photo-1669048780129-051d670fa2d1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-        None,
-    ])
+    job_config = bigquery.QueryJobConfig(
+        query_parameters=[bigquery.ScalarQueryParameter("user_id", "STRING", user_id)]
+    )
+    rows = list(client.query(query, job_config=job_config).result())
+
+    if rows:
+        workout_summary = "\n".join([
+            f"- Workout on {row['StartTimestamp']}: {row['TotalSteps']} steps, "
+            f"{row['TotalDistance']} km, {row['CaloriesBurned']} calories burned"
+            for row in rows
+        ])
+        prompt = f"""You are a friendly fitness coach. Based on the user's recent workouts, 
+give them short, personalized, motivational fitness advice (2-3 sentences max). 
+Vary your advice each time. Recent workouts:
+{workout_summary}"""
+    else:
+        prompt = """You are a friendly fitness coach. Give a new user short, 
+motivational fitness advice to get started (2-3 sentences max). Vary your advice each time."""
+
+    vertexai.init(project=project_id, location="us-central1")
+    model = GenerativeModel("gemini-1.5-flash")
+    response = model.generate_content(prompt)
+    advice_text = response.text
+
+    image = None
+    if random.random() < 0.4:
+        image = 'https://plus.unsplash.com/premium_photo-1669048780129-051d670fa2d1?q=80&w=3870&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+
     return {
-        'advice_id': 'advice1',
-        'timestamp': '2024-01-01 00:00:00',
-        'content': advice,
+        'advice_id': str(uuid.uuid4()),
+        'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'content': advice_text,
         'image': image,
     }
