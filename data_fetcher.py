@@ -17,7 +17,13 @@ import vertexai
 from vertexai.generative_models import GenerativeModel
 
 project_id = os.environ.get("PROJECT_ID", "johnny-aryeetey-csudh")
-client = bigquery.Client()
+client = None
+
+def get_client():
+    global client
+    if client is None:
+        client = bigquery.Client()
+    return client
 
 users = {
     'user1': {
@@ -206,7 +212,7 @@ def get_genai_advice(user_id):
     job_config = bigquery.QueryJobConfig(
         query_parameters=[bigquery.ScalarQueryParameter("user_id", "STRING", user_id)]
     )
-    rows = list(client.query(query, job_config=job_config).result())
+    rows = list(get_client().query(query, job_config=job_config).result())
 
     if rows:
         workout_summary = "\n".join([
