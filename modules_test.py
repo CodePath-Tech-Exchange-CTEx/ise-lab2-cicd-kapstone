@@ -16,10 +16,11 @@ from modules import display_post, display_activity_summary, display_genai_advice
 class TestDisplayPost(unittest.TestCase):
     """Tests the display_post function."""
 
+    @patch('data_fetcher.GenerativeModel')
     @patch('data_fetcher.get_client')
-    def test_post_without_image(self, mock_client):
-        """Tests that a post renders username and content correctly."""
+    def test_post_without_image(self, mock_client, mock_model_class):
         mock_client.return_value.query.return_value.result.return_value = []
+        mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
         at = AppTest.from_file("app.py")
         at.run()
         at.text_input[1].set_value("testuser")
@@ -29,24 +30,37 @@ class TestDisplayPost(unittest.TestCase):
         self.assertEqual(at.markdown[1].value, "testcontent")
         self.assertIsNotNone(at.caption[0].value)
 
+    @patch('data_fetcher.GenerativeModel')
     @patch('data_fetcher.get_client')
-    def test_no_username(self, mock_client):
-        """Tests that a warning is shown when no username is entered."""
+    def test_no_username(self, mock_client, mock_model_class):
         mock_client.return_value.query.return_value.result.return_value = []
+        mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
         at = AppTest.from_file("app.py")
         at.run()
         at.text_area[0].set_value("testcontent")
         at.button[0].click().run()
         self.assertEqual(at.warning[0].value, "please enter username")
 
+    @patch('data_fetcher.GenerativeModel')
     @patch('data_fetcher.get_client')
-    def test_content_too_long(self, mock_client):
-        """Tests that a warning is shown when content exceeds 280 characters."""
+    def test_content_too_long(self, mock_client, mock_model_class):
         mock_client.return_value.query.return_value.result.return_value = []
+        mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
         at = AppTest.from_file("app.py")
         at.run()
         at.text_input[1].set_value("testuser")
         at.text_area[0].set_value("a" * 281)
+        at.button[0].click().run()
+        self.assertEqual(at.warning[0].value, "description must be between 1 and 280 characters")
+
+    @patch('data_fetcher.GenerativeModel')
+    @patch('data_fetcher.get_client')
+    def test_no_content(self, mock_client, mock_model_class):
+        mock_client.return_value.query.return_value.result.return_value = []
+        mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
+        at = AppTest.from_file("app.py")
+        at.run()
+        at.text_input[1].set_value("testuser")
         at.button[0].click().run()
         self.assertEqual(at.warning[0].value, "description must be between 1 and 280 characters")
 
