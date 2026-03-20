@@ -23,7 +23,7 @@ class TestDisplayPost(unittest.TestCase):
         mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
         at = AppTest.from_file("app.py")
         at.run()
-        at.text_input[1].set_value("testuser")
+        at.text_input[0].set_value("testuser")
         at.text_area[0].set_value("testcontent")
         at.button[0].click().run()
         self.assertEqual(at.markdown[0].value, "testuser")
@@ -48,7 +48,7 @@ class TestDisplayPost(unittest.TestCase):
         mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
         at = AppTest.from_file("app.py")
         at.run()
-        at.text_input[1].set_value("testuser")
+        at.text_input[0].set_value("testuser")
         at.text_area[0].set_value("a" * 281)
         at.button[0].click().run()
         self.assertEqual(at.warning[0].value, "description must be between 1 and 280 characters")
@@ -60,17 +60,7 @@ class TestDisplayPost(unittest.TestCase):
         mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
         at = AppTest.from_file("app.py")
         at.run()
-        at.text_input[1].set_value("testuser")
-        at.button[0].click().run()
-        self.assertEqual(at.warning[0].value, "description must be between 1 and 280 characters")
-
-    @patch('data_fetcher.get_client')
-    def test_no_content(self, mock_client):
-        """Tests that a warning is shown when no content is entered."""
-        mock_client.return_value.query.return_value.result.return_value = []
-        at = AppTest.from_file("app.py")
-        at.run()
-        at.text_input[1].set_value("testuser")
+        at.text_input[0].set_value("testuser")
         at.button[0].click().run()
         self.assertEqual(at.warning[0].value, "description must be between 1 and 280 characters")
 
