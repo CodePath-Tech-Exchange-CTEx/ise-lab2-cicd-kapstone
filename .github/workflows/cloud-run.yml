@@ -11,11 +11,11 @@ on:
 
 env:
   # TODO: Paste output from setup.sh below.
-  PROJECT_ID: 'amya-brooks-hu'
+  PROJECT_ID: 'johnny-aryeetey-csudh'
   SERVICE_NAME: 'kapstone-website'
   SERVICE_REGION: 'us-central1'
-  SERVICE_ACCOUNT: '825239029039-compute@developer.gserviceaccount.com'
-  WORKLOAD_IDENTITY_PROVIDER: 'projects/825239029039/locations/global/workloadIdentityPools/github-provider/providers/github-project-repo'
+  SERVICE_ACCOUNT: '199741713332-compute@developer.gserviceaccount.com'
+  WORKLOAD_IDENTITY_PROVIDER: 'projects/199741713332/locations/global/workloadIdentityPools/github-provider/providers/github-project-repo'
 
 jobs:
   py-checks:
