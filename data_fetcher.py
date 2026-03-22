@@ -175,11 +175,33 @@ def get_user_sensor_data(user_id, workout_id):
 def get_user_profile(user_id):
     """Returns information about the given user.
 
-    This function currently returns random data. You will re-write it in Unit 3.
+    This function currently returns random data.
     """
     if user_id not in users:
         raise ValueError(f'User {user_id} not found.')
-    return users[user_id]
+
+    user_data = users[user_id]
+
+    #table for friendships
+    friends_table = [
+        {'UserId1': 'user1', 'UserId2': 'user2'},
+        {'UserId1': 'user3', 'UserId2': 'user1'},
+        {'UserId1': 'user1', 'UserId2': 'user4'},
+        {'UserId1': 'user3', 'UserId2': 'user4'},
+    ]
+    friend_ids = []
+    for relationship in friends_table:
+        if relationship['UserId1'] == user_id:
+            friend_ids.append(relationship['UserId2'])
+        elif relationship['UserId2'] == user_id:
+            friend_ids.append(relationship['UserId1'])
+    return {
+        'full_name': user_data.get('full_name'),
+        'username': user_data.get('username'),
+        'date_of_birth': user_data.get('date_of_birth'),
+        'profile_image': user_data.get('profile_image'),
+        'friends': friend_ids
+    }
 
 
 def get_user_posts(user_id):
@@ -187,17 +209,43 @@ def get_user_posts(user_id):
 
     This function currently returns random data. You will re-write it in Unit 3.
     """
-    content = random.choice([
-        'Had a great workout today!',
-        'The AI really motivated me to push myself further, I ran 10 miles!',
-    ])
-    return [{
-        'user_id': user_id,
-        'post_id': 'post1',
-        'timestamp': '2024-01-01 00:00:00',
-        'content': content,
-        'image': 'image_url',
-    }]
+    #table of all posts
+    posts_table = [
+        {
+            'post_id': 'post1',
+            'AuthorId': 'user1',
+            'timestamp': '2026-01-01 00:00:00',
+            'content': None,
+            'image': 'https://example.com/workout.jpg',
+        },
+        {
+            'post_id': 'post2',
+            'AuthorId': 'user1',
+            'timestamp': '2026-01-02 12:00:00',
+            'content': 'Feeling sore but motivated.',
+            'image': 'placeholder.png',
+        },
+        {
+            'post_id': 'post3',
+            'AuthorId': 'user2',
+            'timestamp': '2026-01-03 09:00:00',
+            'content':'Forgot my camera today!',
+            'image': None,
+        },
+    ]
+    result = []
+    for post in posts_table:
+        if post['AuthorId'] == user_id:
+            result.append({
+                'user_id': user_id,
+                'post_id': post.get('post_id'),
+                'timestamp': post.get('timestamp'),
+                # If content is None, it becomes ""
+                'content': post.get('content') or "", 
+                # If image is None, it stays None
+                'image': post.get('image') or None
+            })
+    return result
 
 
 def get_genai_advice(user_id):
