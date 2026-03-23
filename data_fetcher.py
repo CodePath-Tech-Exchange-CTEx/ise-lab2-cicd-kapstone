@@ -277,7 +277,7 @@ Vary your advice each time. Recent workouts:
 motivational fitness advice to get started (2-3 sentences max). Vary your advice each time."""
 
     vertexai.init(project=project_id, location="us-central1")
-    model = GenerativeModel("gemini-3.1-pro-preview")
+    model = GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(prompt)
     advice_text = response.text
 
