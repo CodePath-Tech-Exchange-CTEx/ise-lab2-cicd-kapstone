@@ -16,7 +16,7 @@ from google.cloud import bigquery
 import vertexai
 from vertexai.generative_models import GenerativeModel
 
-project_id = os.environ.get("PROJECT_ID", "johnny-aryeetey-csudh")
+project_id = os.environ.get("PROJECT_ID", "amya-brooks-hu")
 client = None
 
 def get_client():

@@ -45,7 +45,7 @@ streamlit run app.py
 ```
 
 **Note:** When you make changes, you just
-need to refresh the webpage and the new changes should appear (*you do NOT need to rerun the previous command while you are actively making changes*).
+need to refresh the webpage and the new changes shgittould appear (*you do NOT need to rerun the previous command while you are actively making changes*).
 
 ## Step 3: Using Docker to run the Streamlit app
 
