@@ -1,5 +1,5 @@
 ### VARIABLES TO CHANGE - START
-PROJECT_ID='johnny-aryeetey-csudh'
+PROJECT_ID='amya-brooks-hu'
 SERVICE_NAME='kapstone-website'
 ### VARIABLES TO CHANGE - END
 
