@@ -1,6 +1,6 @@
 ### VARIABLES TO CHANGE - START
-PROJECT_ID=amya-brooks-hu
-PROJECT_NUMBER=825239029039
+PROJECT_ID=johnny-aryeetey-csudh
+PROJECT_NUMBER=199741713332
 SERVICE_NAME=kapstone-website
 GITHUB_ORG=CodePath-Tech-Exchange-CTEx
 GITHUB_REPO=ise-lab2-cicd-kapstone
