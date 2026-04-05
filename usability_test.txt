@@ -46,3 +46,78 @@ Scenario: You want to set a new fitness goal for yourself and track your progres
 - Confusions: Unclear what certain features are for
 - Quote: "the UI is super nice, everything about it is good, I just feel like it could help the user understand more on what they're looking for"
 - Improvements: Add more guidance/labels to help users understand each feature
+
+
+## Results
+
+### Issues Found
+
+#### Meal Plan Issues
+
+**Issue 1:**
+- Issue: Users were unsure what the dropdown arrow (▽) on each meal 
+  section does before clicking it
+- Hypothesis: The arrow icon alone is not a clear enough signal that 
+  clicking it expands the meal details. Users expected a label or 
+  tooltip explaining the action
+- Remedy: Add a small text label next to the arrow such as 
+  "tap to expand" or replace the arrow with a clearly labeled 
+  "View Details" button
+
+**Issue 2:**
+- Issue: The calorie goal field shows "####" as a placeholder which 
+  does not tell users what number to enter or what the goal refers to
+- Hypothesis: Users do not know if the goal is daily, weekly, or 
+  per meal, causing confusion about what number to type in
+- Remedy: Add a helper text below the goal field such as 
+  "Enter your daily calorie target (e.g. 2000)" to make it 
+  immediately clear what is expected
+
+#### Goal Setter Issues
+
+**Issue 3:**
+- Issue: Users wanted more guidance on what to enter in the 
+  "Target" field on the goal creation form
+- Hypothesis: The label "Target" is too vague — users don't know 
+  if it means a number of miles, calories, minutes, or something else
+- Remedy: Add placeholder text inside the Target field such as 
+  "e.g. 10 miles" or "e.g. 500 calories" based on the selected 
+  workout type
+
+**Issue 4:**
+- Issue: Users could not tell what workout the progress bar on the 
+  Progress Tracker screen was tracking since the "Workout:" field 
+  appeared blank
+- Hypothesis: The progress tracker does not clearly show which 
+  specific goal it is displaying, making it hard to understand 
+  what 75% refers to
+- Remedy: Pre-fill the Workout label with the goal name set during 
+  goal creation, and add a subtitle such as 
+  "Goal: Run 10 miles | Progress: 7.5 miles completed"
+
+---
+
+### Direct Quotes
+
+- Participant 1: "smooth, accepted images and didn't take too long 
+  to load"
+- Participant 2: "the UI is super nice, everything about it is good, 
+  I just feel like it could help the user understand more on what 
+  they're looking for"
+
+---
+
+### Summary
+
+Both participants were able to complete the tasks, but Participant 2 
+highlighted a key theme: the app looks great visually but needs 
+better guidance to help users understand what each element does. 
+The main areas for improvement are:
+
+1. Clearer labels and placeholder text in both features
+2. Better explanation of interactive elements like the dropdown arrow
+3. More context on the Progress Tracker so users know what they 
+   are tracking
+
+These fixes are low effort but would significantly improve how 
+easily new users can understand and use the app.
