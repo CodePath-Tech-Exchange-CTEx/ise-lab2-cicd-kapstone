@@ -5,7 +5,7 @@ Hi, my name is Johnny and we are a team of 4 students building a fitness social 
 
 Your job is not to impress us — there are no right or wrong answers. We want to see how you naturally interact with the design. Please think out loud as much as possible — tell us what you're looking at, what you're thinking, and what you expect to happen before you do it.
 
-We will be showing you paper screens and you can point or "tap" on them to interact. We'll swap screens based on your actions.
+We will be showing you the live app and asking you to interact with it directly.
 
 ---
 
@@ -24,21 +24,25 @@ Scenario: You want to set a new fitness goal for yourself and track your progres
 ## Notes
 
 ### Participant 1
-- Feature 1 observations:
-- Feature 2 observations:
+- Feature 1 observations: Completed meal plan task smoothly, no hesitation
+- Feature 2 observations: Completed goal setter task smoothly, no hesitation
+- General: Said the app was smooth, images loaded fine, no long load times
 
 ### Participant 2
-- Feature 1 observations:
-- Feature 2 observations:
-
----
+- Feature 1 observations: Completed task but felt the UI could be clearer
+- Feature 2 observations: Completed task but wanted more guidance on what to do
+- General: Rated app 6/10, liked the UI design but felt the app could better guide users on what they're looking at
 
 ## Feedback
 
-(To be filled in by Pratham)
+### Participant 1
+- Ease of task: Easy
+- Confusions: None noted
+- Quote: "smooth, accepted images and didn't take too long to load"
+- Improvements: None suggested
 
----
-
-## Results
-
-(To be filled in by Pratham)
+### Participant 2
+- Ease of task: Moderate
+- Confusions: Unclear what certain features are for
+- Quote: "the UI is super nice, everything about it is good, I just feel like it could help the user understand more on what they're looking for"
+- Improvements: Add more guidance/labels to help users understand each feature
