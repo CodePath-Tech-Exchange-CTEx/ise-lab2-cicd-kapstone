@@ -1,0 +1,38 @@
+#############################################################################
+# features.txt
+#
+# This file contains the planned features for Unit 5.
+#############################################################################
+
+=============================================================================
+FEATURE 1: Meal Plan
+=============================================================================
+Title: Meal Plan
+Description: A page where users can track their daily meals by adding food 
+items with calorie counts to Breakfast, Lunch, and Dinner sections. Users 
+can view their total calories and compare against their calorie goal.
+Acceptance Criteria:
+  - User can add a food item and calorie count to any meal section
+  - Each meal section is collapsible using a dropdown
+  - Total calories are displayed and updated when food is added
+  - User can set and view a calorie goal
+  - Confirmation is shown after saving a meal
+Priority: High
+Story Points: 3
+
+=============================================================================
+FEATURE 2: Goal Setter
+=============================================================================
+Title: Goal Setter
+Description: A page where users can create fitness goals by specifying a 
+goal name, workout type, target, and timeframe. Users can then track their 
+progress toward each goal using a progress bar and view recent activity.
+Acceptance Criteria:
+  - User can fill out a goal creation form with all required fields
+  - Workout type can be selected from a dropdown
+  - Timeframe can be set as Daily or Weekly
+  - Progress tracker shows a progress bar with percentage
+  - Recent activity is displayed below the progress bar
+  - User can increment or decrement progress using + and - buttons
+Priority: High
+Story Points: 3
