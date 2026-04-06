@@ -7,32 +7,155 @@
 =============================================================================
 FEATURE 1: Meal Plan
 =============================================================================
-Title: Meal Plan
-Description: A page where users can track their daily meals by adding food 
-items with calorie counts to Breakfast, Lunch, and Dinner sections. Users 
-can view their total calories and compare against their calorie goal.
+Feature Description:
+A page where users can track their daily meals by adding food items with 
+calorie counts to Breakfast, Lunch, and Dinner sections. Users can view 
+their total calories and compare against their calorie goal.
+
+-----------------------------------------------------------------------------
+Task 1: Build Meal Section UI
+-----------------------------------------------------------------------------
+Title: Build Meal Section UI
+Description: Create the main Meal Plan page with collapsible sections for 
+Breakfast, Lunch, and Dinner. Each section should have a dropdown arrow to 
+expand/collapse and a + button to add food items.
 Acceptance Criteria:
-  - User can add a food item and calorie count to any meal section
-  - Each meal section is collapsible using a dropdown
-  - Total calories are displayed and updated when food is added
-  - User can set and view a calorie goal
-  - Confirmation is shown after saving a meal
+  - Page displays three sections: Breakfast, Lunch, Dinner
+  - Each section is collapsible using a dropdown arrow
+  - Each section has a + button to trigger adding food
+  - Page header shows "Meal Plan" title
 Priority: High
 Story Points: 3
+
+-----------------------------------------------------------------------------
+Task 2: Build Add Food Form
+-----------------------------------------------------------------------------
+Title: Build Add Food Form
+Description: Create a form that appears when the user clicks the + button 
+on any meal section. The form should allow the user to type in a food name 
+and enter the calorie count, then click Add to save it.
+Acceptance Criteria:
+  - Form appears when + button is clicked
+  - User can type in food name
+  - User can enter calorie amount
+  - Clicking Add saves the food item to the correct meal section
+  - Form closes after submission
+Priority: High
+Story Points: 2
+
+-----------------------------------------------------------------------------
+Task 3: Build Calorie Tracker and Goal Display
+-----------------------------------------------------------------------------
+Title: Build Calorie Tracker and Goal Display
+Description: Display a running total of calories across all meal sections 
+at the top of the page. Allow the user to set a calorie goal and show it 
+next to the total so users can compare their intake against their goal.
+Acceptance Criteria:
+  - Total calories update automatically when food is added
+  - Calorie goal field is displayed at the top of the page
+  - User can set or update their calorie goal
+  - Total calories and goal are shown side by side
+Priority: High
+Story Points: 3
+
+-----------------------------------------------------------------------------
+Task 4: Add Save Confirmation and Food Item Display
+-----------------------------------------------------------------------------
+Title: Add Save Confirmation and Food Item Display
+Description: After a user adds a food item, show a confirmation message. 
+Each meal section should display the list of added food items with their 
+calorie counts when expanded.
+Acceptance Criteria:
+  - Confirmation message appears after food is successfully added
+  - Each expanded meal section shows list of food items with calories
+  - Each food item shows name and calorie count
+  - Total calories per meal section are shown inside the dropdown
+Priority: Medium
+Story Points: 2
 
 =============================================================================
 FEATURE 2: Goal Setter
 =============================================================================
-Title: Goal Setter
-Description: A page where users can create fitness goals by specifying a 
-goal name, workout type, target, and timeframe. Users can then track their 
-progress toward each goal using a progress bar and view recent activity.
+Feature Description:
+A page where users can create fitness goals by specifying a goal name, 
+workout type, target, and timeframe. Users can then track their progress 
+toward each goal using a progress bar and view recent activity.
+
+-----------------------------------------------------------------------------
+Task 1: Build Goal Creation Form
+-----------------------------------------------------------------------------
+Title: Build Goal Creation Form
+Description: Create a form where users can set a new fitness goal. The form 
+should include fields for goal name, workout type dropdown, target amount, 
+and timeframe selection with Cancel and Save buttons.
 Acceptance Criteria:
-  - User can fill out a goal creation form with all required fields
-  - Workout type can be selected from a dropdown
-  - Timeframe can be set as Daily or Weekly
-  - Progress tracker shows a progress bar with percentage
-  - Recent activity is displayed below the progress bar
-  - User can increment or decrement progress using + and - buttons
+  - Form includes goal name text field
+  - Workout type can be selected from a dropdown (e.g. Cardio, Strength)
+  - Target field accepts a numeric value
+  - Timeframe can be selected as Daily or Weekly using radio buttons
+  - Cancel button closes the form without saving
+  - Save button saves the goal and navigates to progress tracker
 Priority: High
 Story Points: 3
+
+-----------------------------------------------------------------------------
+Task 2: Build Progress Tracker UI
+-----------------------------------------------------------------------------
+Title: Build Progress Tracker UI
+Description: Create the Progress Tracker screen that shows the user's 
+current goal, a progress bar showing percentage complete, and + / - buttons 
+to manually update progress.
+Acceptance Criteria:
+  - Progress tracker displays the current goal name
+  - Progress bar shows percentage of goal completed
+  - Percentage is displayed as a number below the progress bar
+  - + button increases progress
+  - - button decreases progress
+  - Progress cannot go below 0% or above 100%
+Priority: High
+Story Points: 3
+
+-----------------------------------------------------------------------------
+Task 3: Display Recent Activity
+-----------------------------------------------------------------------------
+Title: Display Recent Activity
+Description: Below the progress tracker, display a list of recent activity 
+entries showing what the user has logged toward their goal such as miles 
+run or calories burned each day.
+Acceptance Criteria:
+  - Recent activity section appears below the progress tracker
+  - Each activity entry shows what was logged and when
+  - At least 2 recent entries are displayed
+  - Section is clearly labeled "Recent Activity"
+Priority: Medium
+Story Points: 2
+
+-----------------------------------------------------------------------------
+Task 4: Connect Goal Setter to Progress Tracker
+-----------------------------------------------------------------------------
+Title: Connect Goal Setter to Progress Tracker
+Description: After a user saves a goal using the Goal Creation Form, 
+automatically navigate to the Progress Tracker and display the new goal. 
+The goal name and target should carry over from the form to the tracker.
+Acceptance Criteria:
+  - Saving a goal navigates user to Progress Tracker automatically
+  - Progress Tracker displays the goal name from the form
+  - Progress starts at 0% when a new goal is created
+  - Add Workout button is visible and functional on the tracker screen
+Priority: High
+Story Points: 3
+
+=============================================================================
+WEEK 1 PLAN
+=============================================================================
+Feature 1 - Meal Plan:
+  - Task 1: Build Meal Section UI         | Priority: High | Story Points: 3
+  - Task 2: Build Add Food Form           | Priority: High | Story Points: 2
+  - Task 3: Build Calorie Tracker         | Priority: High | Story Points: 3
+  - Task 4: Save Confirmation and Display | Priority: Medium | Story Points: 2
+
+Feature 2 - Goal Setter:
+  - Task 1: Build Goal Creation Form      | Priority: High | Story Points: 3
+  - Task 2: Build Progress Tracker UI     | Priority: High | Story Points: 3
+  - Task 3: Display Recent Activity       | Priority: Medium | Story Points: 2
+  - Task 4: Connect Goal Setter to Tracker| Priority: High | Story Points: 3
