@@ -6,10 +6,16 @@
 # You will write these tests in Unit 3.
 #############################################################################
 import unittest
-from data_fetcher import get_user_workouts, get_user_sensor_data, get_user_profile, get_user_posts
+from data_fetcher import add_user_post, get_user_workouts, get_user_sensor_data, get_user_profile, get_user_posts, posts_table
 
 
 class TestDataFetcher(unittest.TestCase):
+
+    def setUp(self):
+        self.original_posts = [post.copy() for post in posts_table]
+
+    def tearDown(self):
+        posts_table[:] = self.original_posts
 
     def test_get_user_workouts_returns_correct_keys(self):
         workouts = get_user_workouts('user1')
@@ -111,7 +117,7 @@ class TestDataFetcher(unittest.TestCase):
     def test_get_user_posts_valid_user_with_data(self):
         posts = get_user_posts('user1')
         self.assertEqual(len(posts), 2)
-        self.assertEqual(posts[0]['post_id'], 'post1')
+        self.assertEqual(posts[0]['post_id'], 'post2')
 
     def test_get_user_posts_user_with_no_posts(self):
         posts = get_user_posts('user4') 
@@ -121,6 +127,13 @@ class TestDataFetcher(unittest.TestCase):
         posts = get_user_posts('user1')
         post1 = next(p for p in posts if p['post_id'] == 'post1')
         self.assertEqual(post1['content'], "")
+
+    def test_add_user_post_is_returned_in_latest_posts(self):
+        created = add_user_post('user4', 'Testing a new community post.')
+        posts = get_user_posts('user4')
+        self.assertGreaterEqual(len(posts), 1)
+        self.assertEqual(posts[0]['post_id'], created['post_id'])
+        self.assertEqual(posts[0]['content'], 'Testing a new community post.')
 
 
 if __name__ == "__main__":

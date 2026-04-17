@@ -9,6 +9,7 @@
 
 from internals import create_component
 import streamlit as st
+import os
 
 
 # This one has been written for you as an example. You may change it as wanted.
@@ -18,14 +19,9 @@ def display_my_custom_component(value):
 
     value: the name you'd like to be called by within the app
     """
-    # Define any templated data from your HTML file. The contents of
-    # 'value' will be inserted to the templated HTML file wherever '{{NAME}}'
-    # occurs. You can add as many variables as you want.
     data = {
         'NAME': value,
     }
-    # Register and display the component by providing the data and name
-    # of the HTML file. HTML must be placed inside the "custom_components" folder.
     html_file_name = "my_custom_component"
     create_component(data, html_file_name)
 
@@ -48,56 +44,63 @@ def display_post(username, user_image, timestamp, content, post_image):
     col1, col2 = st.columns(2)
     with col1:
         if user_image:
-            st.image(user_image, width=50)
+            try:
+                st.image(user_image, width=50)
+            except Exception:
+                st.caption("Profile image unavailable")
     with col2:
         st.write(username)
     if post_image:
-        st.image(post_image)
+        try:
+            if isinstance(post_image, str) and not (post_image.startswith("http://") or post_image.startswith("https://")):
+                if os.path.exists(post_image):
+                    st.image(post_image)
+                else:
+                    st.caption("Post image unavailable")
+            else:
+                st.image(post_image)
+        except Exception:
+            st.caption("Post image unavailable")
     st.write(content)
     st.caption(timestamp.strftime("%B %d, %Y at %I:%M %p"))
 
 
-    
 def display_activity_summary(workouts_list):
     if not workouts_list:
         st.write("No workouts recorded.")
         return None
 
-    # Logic remains exactly the same
-    # FIXED - handles None values properly
     total_dist = sum(w.get('distance') or 0 for w in workouts_list)
     total_steps = sum(w.get('steps') or 0 for w in workouts_list)
-    total_cals = sum(w.get('calories') or 0 for w in workouts_list)
+    total_cals = sum((w.get('calories_burned') if w.get('calories_burned') is not None else w.get('calories')) or 0 for w in workouts_list)
 
-    # Header section - Now using st.write to show on the website
     st.header("Activity Summary")
     st.write("==============================")
     st.subheader("Totals Summary")
-    
+
     st.write(f"**Total Workouts:** {len(workouts_list)}")
     st.write(f"**Total Distance:** {total_dist:.1f} miles")
     st.write(f"**Total Steps:** {total_steps:,}")
     st.write(f"**Total Calories:** {total_cals}")
     st.write("------------------------------")
 
-    # The loop to show individual workouts
-    for i, w in enumerate(workouts_list, 1):
-        start = w.get('start_timestamp', 'Unknown')
-        end = w.get('end_timestamp', 'Unknown')
-        dist = w.get('distance', 0)
-        steps = w.get('steps', 0)
-        cals = w.get('calories', 0)
+    for i, workout in enumerate(workouts_list, 1):
+        start = workout.get('start_timestamp', 'Unknown')
+        end = workout.get('end_timestamp', 'Unknown')
+        dist = workout.get('distance', 0)
+        steps = workout.get('steps', 0)
+        calories = workout.get('calories_burned')
+        if calories is None:
+            calories = workout.get('calories', 0)
 
         st.write(f"### Workout {i}")
         st.write(f"**Start:** {start} | **End:** {end}")
         st.write(f"**Distance:** {dist} miles")
         st.write(f"**Steps:** {steps:,}")
-        st.write(f"**Calories:** {cals}")
+        st.write(f"**Calories:** {calories}")
         st.write("------------------------------")
 
     return None
-    
-    # Render the component using the HTML file in custom_components/
 
 
 def display_recent_workouts(workouts_list=[]):
@@ -108,31 +111,27 @@ def display_recent_workouts(workouts_list=[]):
     Parameters:
         workouts_list (list): A list of workout dictionaries, each containing:
             - 'distance': miles traveled
-            - 'steps': steps taken  
+            - 'steps': steps taken
             - 'calories': calories burned
             - 'start_time': when the workout started
             - 'end_time': when the workout ended
     """
 
-    # If no workouts, show a friendly message and stop
     if not workouts_list:
         st.info("No recent workouts to show.")
         return
 
-
-   
-    # Step A: Loop through workouts and build one big HTML string
-    cards_html = ""  # start with empty string
+    cards_html = ""
 
     for i, workout in enumerate(workouts_list, start=1):
-        # Safely get each value, defaulting if missing
         start = workout.get('start_timestamp', 'Unknown')
-        end   = workout.get('end_timestamp', 'Unknown')
+        end = workout.get('end_timestamp', 'Unknown')
         distance = workout.get('distance', 0)
-        steps    = workout.get('steps', 0)
-        calories = workout.get('calories', 0)
+        steps = workout.get('steps', 0)
+        calories = workout.get('calories_burned')
+        if calories is None:
+            calories = workout.get('calories', 0)
 
-        # Build one card's HTML and add it to the string
         cards_html += f"""
         <div style="border: 1px solid #ddd;
                     padding: 14px;
@@ -142,16 +141,15 @@ def display_recent_workouts(workouts_list=[]):
             <p style="margin: 0 0 6px 0; font-weight: bold; color: #444;">
                 Workout {i}
             </p>
-            <p style="margin: 2px 0;">📍 <strong>Distance:</strong> {distance} miles</p>
-            <p style="margin: 2px 0;">👟 <strong>Steps:</strong> {steps:,}</p>
-            <p style="margin: 2px 0;">🔥 <strong>Calories:</strong> {calories}</p>
+            <p style="margin: 2px 0;"><strong>Distance:</strong> {distance} miles</p>
+            <p style="margin: 2px 0;"><strong>Steps:</strong> {steps:,}</p>
+            <p style="margin: 2px 0;"><strong>Calories:</strong> {calories}</p>
             <p style="margin: 6px 0 0 0; font-size: 0.8em; color: #888;">
-                {start} → {end}
+                {start} to {end}
             </p>
         </div>
         """
 
-    # Step B: Pass the finished HTML string to the component
     data = {
         'WORKOUT_CARDS': cards_html
     }
@@ -160,7 +158,7 @@ def display_recent_workouts(workouts_list=[]):
 
 def display_genai_advice(timestamp, content, image):
 
-    st.subheader("💡 AI-Powered Advice")
+    st.subheader("AI-Powered Advice")
     st.caption(f"Generated on: {timestamp}")
 
     col1, col2 = st.columns([2, 1])

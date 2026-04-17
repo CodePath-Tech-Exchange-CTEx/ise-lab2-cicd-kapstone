@@ -56,6 +56,30 @@ users = {
     },
 }
 
+posts_table = [
+    {
+        'post_id': 'post1',
+        'AuthorId': 'user1',
+        'timestamp': '2026-01-01 00:00:00',
+        'content': None,
+        'image': 'https://example.com/workout.jpg',
+    },
+    {
+        'post_id': 'post2',
+        'AuthorId': 'user1',
+        'timestamp': '2026-01-02 12:00:00',
+        'content': 'Feeling sore but motivated.',
+        'image': None,
+    },
+    {
+        'post_id': 'post3',
+        'AuthorId': 'user2',
+        'timestamp': '2026-01-03 09:00:00',
+        'content': 'Forgot my camera today!',
+        'image': None,
+    },
+]
+
 
 def get_user_workouts(user_id):
     """Returns a list of workouts for the given user.
@@ -209,30 +233,6 @@ def get_user_posts(user_id):
 
     This function currently returns random data. You will re-write it in Unit 3.
     """
-    #table of all posts
-    posts_table = [
-        {
-            'post_id': 'post1',
-            'AuthorId': 'user1',
-            'timestamp': '2026-01-01 00:00:00',
-            'content': None,
-            'image': 'https://example.com/workout.jpg',
-        },
-        {
-            'post_id': 'post2',
-            'AuthorId': 'user1',
-            'timestamp': '2026-01-02 12:00:00',
-            'content': 'Feeling sore but motivated.',
-            'image': 'placeholder.png',
-        },
-        {
-            'post_id': 'post3',
-            'AuthorId': 'user2',
-            'timestamp': '2026-01-03 09:00:00',
-            'content':'Forgot my camera today!',
-            'image': None,
-        },
-    ]
     result = []
     for post in posts_table:
         if post['AuthorId'] == user_id:
@@ -245,7 +245,25 @@ def get_user_posts(user_id):
                 # If image is None, it stays None
                 'image': post.get('image') or None
             })
+    result.sort(key=lambda post: str(post.get('timestamp', '')), reverse=True)
     return result
+
+
+def add_user_post(user_id, content, image=None, timestamp=None):
+    """Adds a post to the in-memory data store used by the app."""
+    normalized_timestamp = timestamp or datetime.now()
+    if isinstance(normalized_timestamp, datetime):
+        normalized_timestamp = normalized_timestamp.strftime('%Y-%m-%d %H:%M:%S')
+
+    new_post = {
+        'post_id': str(uuid.uuid4()),
+        'AuthorId': user_id,
+        'timestamp': normalized_timestamp,
+        'content': content or "",
+        'image': image,
+    }
+    posts_table.append(new_post)
+    return new_post
 
 
 def get_genai_advice(user_id):
@@ -257,29 +275,32 @@ def get_genai_advice(user_id):
         ORDER BY StartTimestamp DESC
         LIMIT 3
     """
-    job_config = bigquery.QueryJobConfig(
-        query_parameters=[bigquery.ScalarQueryParameter("user_id", "STRING", user_id)]
-    )
-    rows = list(get_client().query(query, job_config=job_config).result())
+    try:
+        job_config = bigquery.QueryJobConfig(
+            query_parameters=[bigquery.ScalarQueryParameter("user_id", "STRING", user_id)]
+        )
+        rows = list(get_client().query(query, job_config=job_config).result())
 
-    if rows:
-        workout_summary = "\n".join([
-            f"- Workout on {row['StartTimestamp']}: {row['TotalSteps']} steps, "
-            f"{row['TotalDistance']} km, {row['CaloriesBurned']} calories burned"
-            for row in rows
-        ])
-        prompt = f"""You are a friendly fitness coach. Based on the user's recent workouts, 
+        if rows:
+            workout_summary = "\n".join([
+                f"- Workout on {row['StartTimestamp']}: {row['TotalSteps']} steps, "
+                f"{row['TotalDistance']} km, {row['CaloriesBurned']} calories burned"
+                for row in rows
+            ])
+            prompt = f"""You are a friendly fitness coach. Based on the user's recent workouts, 
 give them short, personalized, motivational fitness advice (2-3 sentences max). 
 Vary your advice each time. Recent workouts:
 {workout_summary}"""
-    else:
-        prompt = """You are a friendly fitness coach. Give a new user short, 
+        else:
+            prompt = """You are a friendly fitness coach. Give a new user short, 
 motivational fitness advice to get started (2-3 sentences max). Vary your advice each time."""
 
-    vertexai.init(project=project_id, location="us-central1")
-    model = GenerativeModel("gemini-2.5-flash")
-    response = model.generate_content(prompt)
-    advice_text = response.text
+        vertexai.init(project=project_id, location="us-central1")
+        model = GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(prompt)
+        advice_text = response.text
+    except Exception:
+        advice_text = "Keep showing up for yourself. A steady routine beats a perfect one every time."
 
     image = None
     if random.random() < 0.4:

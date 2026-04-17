@@ -1,16 +1,14 @@
 #############################################################################
-# app.py
-#
-# This file contains the entrypoint for the app.
-#
+# app.py  (updated to include Meal Plan page)
 #############################################################################
 
 import streamlit as st
 from datetime import datetime
 from modules import display_my_custom_component, display_post, display_genai_advice, display_activity_summary, display_recent_workouts
-from data_fetcher import get_user_posts, get_genai_advice, get_user_profile, get_user_sensor_data, get_user_workouts
+from data_fetcher import add_user_post, get_user_posts, get_genai_advice, get_user_profile, get_user_sensor_data, get_user_workouts
 from community_page import display_community_page
 from activity_page import display_activity_page
+from meal_plan_page import display_meal_plan_page   # ← new import
 
 userId = 'user1'
 
@@ -26,25 +24,20 @@ def display_app_page():
     st.write("---")
     st.header("Your Fitness Dashboard")
 
-    # Fetch workouts
     workouts = get_user_workouts(userId) or []
 
-    # Activity Summary
     display_activity_summary(workouts)
     st.write("---")
 
-    # Recent Workouts
     st.subheader("Recent Sessions")
     display_recent_workouts(workouts)
     st.write("---")
 
-    # GenAI advice
     advice = get_genai_advice(userId)
     if advice:
         display_genai_advice(advice['timestamp'], advice['content'], advice['image'])
     st.write("---")
 
-    # Display posts form
     with st.form("post_form"):
         username = st.text_input("Enter username")
         user_image = st.file_uploader("profile image", type=["jpg", "jpeg", "png"])
@@ -58,14 +51,16 @@ def display_app_page():
         elif len(content) > 280 or len(content) < 1:
             st.warning("description must be between 1 and 280 characters")
         else:
+            post_image_bytes = read_bytes(post_image)
             post = {
                 "username": username,
                 "user_image_bytes": read_bytes(user_image),
                 "timestamp": datetime.now(),
                 "content": content,
-                "post_image_bytes": read_bytes(post_image),
+                "post_image_bytes": post_image_bytes,
             }
             st.session_state["posts"].append(post)
+            add_user_post(userId, content, image=post_image_bytes, timestamp=post["timestamp"])
 
     for p in reversed(st.session_state["posts"]):
         display_post(
@@ -76,9 +71,12 @@ def display_app_page():
             p["post_image_bytes"],
         )
 
-# This is the starting point for your app.
+
 if __name__ == '__main__':
-    page = st.sidebar.selectbox("Navigate", ["Home", "Community", "Activity"])
+    page = st.sidebar.selectbox(
+        "Navigate",
+        ["Home", "Community", "Activity", "Meal Plan"],  # ← added Meal Plan
+    )
 
     if page == "Home":
         display_app_page()
@@ -86,3 +84,5 @@ if __name__ == '__main__':
         display_community_page(userId)
     elif page == "Activity":
         display_activity_page(userId)
+    elif page == "Meal Plan":
+        display_meal_plan_page()
