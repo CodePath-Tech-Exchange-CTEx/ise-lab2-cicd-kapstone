@@ -6,11 +6,11 @@
 # and a share button to post a stat to the community.
 #############################################################################
 
-from datetime import datetime
+from datetime import date, datetime
 
 import streamlit as st
 
-from data_fetcher import get_user_workouts
+from data_fetcher import add_user_workout, get_user_profile, get_user_workouts
 from modules import display_activity_summary, display_recent_workouts, display_post
 
 
@@ -36,24 +36,69 @@ def display_activity_page(user_id):
     if activity_posts_key not in st.session_state:
         st.session_state[activity_posts_key] = []
 
-    with st.form("activity_post_form"):
-        username = st.text_input("Enter username")
-        user_image = st.file_uploader("profile image", type=["jpg", "jpeg", "png"])
-        content = st.text_area("workout description")
-        post_image = st.file_uploader("workout image", type=["jpg", "jpeg", "png"])
-        submitted = st.form_submit_button("Post")
+    try:
+        profile = get_user_profile(user_id)
+        username = profile.get("username", user_id)
+        user_image = profile.get("profile_image")
+    except Exception:
+        username = user_id
+        user_image = None
+
+    st.subheader("Log a Workout")
+    with st.form("activity_workout_form"):
+        date_col, start_col, end_col = st.columns(3)
+        with date_col:
+            workout_date = st.date_input("Workout date", value=date.today())
+        with start_col:
+            start_time = st.time_input("Start time", value=datetime.now().time(), step=300)
+        with end_col:
+            end_time = st.time_input("End time", value=datetime.now().time(), step=300)
+
+        dist_col, steps_col, cal_col = st.columns(3)
+        with dist_col:
+            distance = st.number_input("Distance (miles)", min_value=0.0, step=0.1, format="%.1f")
+        with steps_col:
+            steps = st.number_input("Steps", min_value=0, step=100)
+        with cal_col:
+            calories_burned = st.number_input("Calories burned", min_value=0, step=10)
+
+        content = st.text_area("Workout notes")
+        post_image = st.file_uploader("Workout image", type=["jpg", "jpeg", "png"])
+        submitted = st.form_submit_button("Log Workout")
 
     if submitted:
-        if username == "":
-            st.warning("please enter username")
-        elif len(content) > 280 or len(content) < 1:
-            st.warning("description must be between 1 and 280 characters")
+        start_timestamp = datetime.combine(workout_date, start_time)
+        end_timestamp = datetime.combine(workout_date, end_time)
+
+        if end_timestamp < start_timestamp:
+            st.warning("End time must be after the start time.")
+        elif distance == 0 and steps == 0 and calories_burned == 0:
+            st.warning("Enter at least one workout stat before logging your workout.")
+        elif len(content) > 280:
+            st.warning("workout notes must be 280 characters or fewer")
         else:
+            workout = add_user_workout(
+                user_id,
+                start_timestamp=start_timestamp,
+                end_timestamp=end_timestamp,
+                distance=float(distance),
+                steps=int(steps),
+                calories_burned=int(calories_burned),
+            )
             activity_entry = {
                 "username": username,
-                "user_image": read_bytes(user_image),
-                "timestamp": datetime.now(),
-                "content": content,
+                "user_image": user_image,
+                "timestamp": start_timestamp,
+                "content": "\n\n".join(
+                    part for part in [
+                        content.strip(),
+                        (
+                            f"Distance: {workout['distance']} miles | "
+                            f"Steps: {workout['steps']:,} | "
+                            f"Calories: {workout['calories_burned']}"
+                        ),
+                    ] if part
+                ),
                 "post_image": read_bytes(post_image),
             }
             st.session_state[activity_posts_key].append(activity_entry)
@@ -74,14 +119,12 @@ def display_activity_page(user_id):
 
     st.write("---")
 
-    # Step 1: Fetch all workouts for this user
     all_workouts = get_user_workouts(user_id) or []
 
     if not all_workouts:
         st.info("You have no recorded workouts yet. Get moving!")
         return
 
-    # Step 2: Sort by start_timestamp descending and take the 3 most recent
     def parse_timestamp(workout):
         ts = workout.get('start_timestamp', '')
         try:
@@ -92,11 +135,9 @@ def display_activity_page(user_id):
     sorted_workouts = sorted(all_workouts, key=parse_timestamp, reverse=True)
     recent_workouts = sorted_workouts[:3]
 
-    # Step 3: Activity Summary (uses all recent 3 workouts)
-    display_activity_summary(recent_workouts)
+    display_activity_summary(sorted_workouts)
     st.write("---")
 
-    # Step 4: Recent Workouts display
     st.subheader("Recent Sessions")
     display_recent_workouts(recent_workouts)
     st.write("---")

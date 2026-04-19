@@ -6,16 +6,36 @@
 # You will write these tests in Unit 3.
 #############################################################################
 import unittest
-from data_fetcher import add_user_post, get_user_workouts, get_user_sensor_data, get_user_profile, get_user_posts, posts_table
+from copy import deepcopy
+from datetime import datetime
+
+from data_fetcher import (
+    add_friends_to_user,
+    add_user_profile,
+    add_user_post,
+    add_user_workout,
+    get_user_posts,
+    get_user_profile,
+    get_user_sensor_data,
+    get_user_workouts,
+    posts_table,
+    users,
+    workouts_table,
+)
 
 
 class TestDataFetcher(unittest.TestCase):
 
     def setUp(self):
+        self.original_users = deepcopy(users)
         self.original_posts = [post.copy() for post in posts_table]
+        self.original_workouts = [workout.copy() for workout in workouts_table]
 
     def tearDown(self):
+        users.clear()
+        users.update(deepcopy(self.original_users))
         posts_table[:] = self.original_posts
+        workouts_table[:] = self.original_workouts
 
     def test_get_user_workouts_returns_correct_keys(self):
         workouts = get_user_workouts('user1')
@@ -98,6 +118,50 @@ class TestDataFetcher(unittest.TestCase):
     def test_get_user_profile_no_friends(self):
         profile = get_user_profile('user2') 
         self.assertIsInstance(profile['friends'], list)
+
+    def test_add_user_profile_is_returned_by_get_user_profile(self):
+        created = add_user_profile(
+            'user5',
+            'Taylor Smith',
+            'taylorsmith',
+            '1995-05-15',
+            'https://example.com/taylor.jpg',
+            friends=['user1', 'user2'],
+        )
+        profile = get_user_profile('user5')
+        self.assertEqual(created['user_id'], 'user5')
+        self.assertEqual(profile['full_name'], 'Taylor Smith')
+        self.assertEqual(profile['username'], 'taylorsmith')
+        self.assertEqual(profile['date_of_birth'], '1995-05-15')
+        self.assertEqual(profile['profile_image'], 'https://example.com/taylor.jpg')
+        self.assertEqual(profile['friends'], ['user1', 'user2'])
+
+    def test_add_user_profile_adds_reverse_friend_link(self):
+        add_user_profile(
+            'user5',
+            'Taylor Smith',
+            'taylorsmith',
+            '1995-05-15',
+            'https://example.com/taylor.jpg',
+            friends=['user2'],
+        )
+        profile = get_user_profile('user2')
+        self.assertIn('user5', profile['friends'])
+
+    def test_add_friends_to_user_adds_two_way_friendship(self):
+        add_user_profile(
+            'user5',
+            'Taylor Smith',
+            'taylorsmith',
+            '1995-05-15',
+            'https://example.com/taylor.jpg',
+        )
+        added = add_friends_to_user('user5', ['user1'])
+        user5_profile = get_user_profile('user5')
+        user1_profile = get_user_profile('user1')
+        self.assertEqual(added, ['user1'])
+        self.assertIn('user1', user5_profile['friends'])
+        self.assertIn('user5', user1_profile['friends'])
         
     #User Posts 
 
@@ -134,6 +198,22 @@ class TestDataFetcher(unittest.TestCase):
         self.assertGreaterEqual(len(posts), 1)
         self.assertEqual(posts[0]['post_id'], created['post_id'])
         self.assertEqual(posts[0]['content'], 'Testing a new community post.')
+
+    def test_add_user_workout_is_returned_in_latest_workouts(self):
+        created = add_user_workout(
+            'user4',
+            start_timestamp=datetime(2026, 4, 19, 9, 0, 0),
+            end_timestamp=datetime(2026, 4, 19, 10, 0, 0),
+            distance=3.2,
+            steps=5400,
+            calories_burned=320,
+        )
+        workouts = get_user_workouts('user4')
+        self.assertEqual(len(workouts), 1)
+        self.assertEqual(workouts[0]['workout_id'], created['workout_id'])
+        self.assertEqual(workouts[0]['distance'], 3.2)
+        self.assertEqual(workouts[0]['steps'], 5400)
+        self.assertEqual(workouts[0]['calories_burned'], 320)
 
 
 if __name__ == "__main__":

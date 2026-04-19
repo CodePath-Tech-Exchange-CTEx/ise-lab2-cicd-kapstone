@@ -7,9 +7,13 @@
 #############################################################################
 
 import streamlit as st
-from data_fetcher import add_user_post, get_user_profile, get_user_posts, get_genai_advice, get_user_workouts
-from modules import display_post, display_genai_advice
+from data_fetcher import add_friends_to_user, add_user_post, get_available_user_ids, get_user_profile, get_user_posts, get_user_workouts
+from modules import display_post
 from datetime import datetime
+
+
+def read_bytes(uploaded):
+    return uploaded.read() if uploaded is not None else None
 
 
 def display_community_page(user_id):
@@ -26,20 +30,6 @@ def display_community_page(user_id):
     st.write("See what you and your friends are up to!")
     st.write("---")
 
-    # --- GenAI Advice Section ---
-    st.subheader("Your Daily Motivation")
-    advice = get_genai_advice(user_id)
-    if advice:
-        display_genai_advice(
-            advice['timestamp'],
-            advice['content'],
-            advice['image']
-        )
-    else:
-        st.info("No advice available right now. Check back later!")
-
-    st.write("---")
-
     all_workouts = get_user_workouts(user_id) or []
 
     def parse_workout_timestamp(workout):
@@ -52,50 +42,80 @@ def display_community_page(user_id):
     sorted_workouts = sorted(all_workouts, key=parse_workout_timestamp, reverse=True)
     recent_workouts = sorted_workouts[:3]
 
-    st.subheader("Share With the Community")
-    st.write("Proud of your progress? Share a stat with your friends!")
-
-    latest = recent_workouts[0] if recent_workouts else {}
-    steps = latest.get('steps') or 0
-    calories = latest.get('calories_burned') or latest.get('calories') or 0
-    distance = latest.get('distance') or 0
-
-    stat_choice = st.selectbox(
-        "Choose a stat to share:",
-        options=["Steps", "Calories Burned", "Distance"],
-        key="community_stat_choice"
-    )
-
-    if stat_choice == "Steps":
-        share_message = f"Look at this, I walked {steps:,} steps today! #FitnessGoals"
-    elif stat_choice == "Calories Burned":
-        share_message = f"Just burned {calories} calories in my latest workout! #Fitness"
-    else:
-        share_message = f"I covered {distance} miles in my latest workout! #Running"
-
-    st.write(f"**Preview:** {share_message}")
-
-    if "share_success" not in st.session_state:
-        st.session_state["share_success"] = False
-
-    if st.button("Share to Community"):
-        add_user_post(user_id, share_message, timestamp=datetime.now())
-        st.session_state["share_success"] = True
-
-    if st.session_state.get("share_success"):
-        st.success("Your post has been shared with the community!")
-
-    st.write("---")
-
-    # --- Community Feed Section ---
-    st.subheader("Community Feed")
-
-    # Step 1: Get the current user's profile to find their friends
     try:
         profile = get_user_profile(user_id)
     except Exception as e:
         st.error(f"Could not load your profile: {e}")
         return
+
+    share_col, friends_col = st.columns([1.6, 1])
+
+    with share_col:
+        st.subheader("Share With the Community")
+        st.write("Proud of your progress? Share a stat with your friends!")
+
+        latest = recent_workouts[0] if recent_workouts else {}
+        steps = latest.get('steps') or 0
+        calories = latest.get('calories_burned') or latest.get('calories') or 0
+        distance = latest.get('distance') or 0
+
+        default_share_message = (
+            f"My latest workout: {distance} miles, {steps:,} steps, {calories} calories burned!"
+        )
+        share_message = st.text_area(
+            "Write your community post:",
+            value=default_share_message,
+            key="community_share_message",
+            help="Edit this message however you'd like before sharing.",
+            height=140,
+        ).strip()
+        share_image = st.file_uploader(
+            "Add an image to your post",
+            type=["jpg", "jpeg", "png"],
+            key="community_share_image",
+        )
+
+        if "share_success" not in st.session_state:
+            st.session_state["share_success"] = False
+
+        if st.button("Share to Community"):
+            if not share_message:
+                st.warning("Please enter a message before sharing.")
+                st.session_state["share_success"] = False
+            else:
+                add_user_post(
+                    user_id,
+                    share_message,
+                    image=read_bytes(share_image),
+                    timestamp=datetime.now(),
+                )
+                st.session_state["share_success"] = True
+
+        if st.session_state.get("share_success"):
+            st.success("Your post has been shared with the community!")
+
+    with friends_col:
+        st.subheader("Manage Friends")
+        available_friends = [candidate_id for candidate_id in get_available_user_ids() if candidate_id != user_id]
+        selected_friends = st.multiselect(
+            "Add friends",
+            options=available_friends,
+            default=profile.get('friends', []),
+            key=f"community_friends_{user_id}",
+        )
+
+        if st.button("Save Friends"):
+            newly_added = add_friends_to_user(user_id, selected_friends)
+            if newly_added:
+                st.success("Friends updated successfully.")
+            else:
+                st.info("No new friends were added.")
+            profile = get_user_profile(user_id)
+
+    st.write("---")
+
+    st.subheader("Community Feed")
+    st.write("---")
 
     friend_ids = profile.get('friends', [])
     author_ids = [user_id] + [friend_id for friend_id in friend_ids if friend_id != user_id]

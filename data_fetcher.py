@@ -80,6 +80,114 @@ posts_table = [
     },
 ]
 
+workouts_table = [
+    {
+        'user_id': 'user1',
+        'workout_id': 'workout1',
+        'start_timestamp': '2024-01-01 07:00:00',
+        'end_timestamp': '2024-01-01 07:30:00',
+        'start_lat_lng': (36.166, -86.783),
+        'end_lat_lng': (36.170, -86.780),
+        'distance': 2.5,
+        'steps': 4000,
+        'calories_burned': 220,
+    },
+    {
+        'user_id': 'user1',
+        'workout_id': 'workout2',
+        'start_timestamp': '2024-01-02 08:00:00',
+        'end_timestamp': '2024-01-02 08:45:00',
+        'start_lat_lng': (36.166, -86.783),
+        'end_lat_lng': (36.175, -86.790),
+        'distance': None,
+        'steps': 5200,
+        'calories_burned': 300,
+    },
+    {
+        'user_id': 'user2',
+        'workout_id': 'workout3',
+        'start_timestamp': '2024-01-03 06:30:00',
+        'end_timestamp': '2024-01-03 07:00:00',
+        'start_lat_lng': None,
+        'end_lat_lng': None,
+        'distance': 1.8,
+        'steps': 2800,
+        'calories_burned': 150,
+    },
+]
+
+
+def user_exists(user_id):
+    """Returns True when the given user ID exists in the in-memory user store."""
+    return user_id in users
+
+
+def get_available_user_ids():
+    """Returns the list of valid user IDs."""
+    return sorted(users.keys())
+
+
+def add_user_profile(user_id, full_name, username, date_of_birth, profile_image, friends=None):
+    """Adds a user profile to the in-memory data store used by the app."""
+    normalized_user_id = (user_id or "").strip()
+    normalized_username = (username or "").strip()
+
+    if not normalized_user_id:
+        raise ValueError("User ID is required.")
+    if normalized_user_id in users:
+        raise ValueError(f"User {normalized_user_id} already exists.")
+    if not normalized_username:
+        raise ValueError("Username is required.")
+
+    normalized_friends = []
+    for friend_id in friends or []:
+        if friend_id in users and friend_id != normalized_user_id and friend_id not in normalized_friends:
+            normalized_friends.append(friend_id)
+
+    normalized_profile_image = profile_image
+    if isinstance(profile_image, str):
+        normalized_profile_image = profile_image.strip() or None
+
+    users[normalized_user_id] = {
+        'full_name': (full_name or "").strip(),
+        'username': normalized_username,
+        'date_of_birth': str(date_of_birth),
+        'profile_image': normalized_profile_image,
+        'friends': normalized_friends,
+    }
+
+    for friend_id in normalized_friends:
+        friend_list = users[friend_id].setdefault('friends', [])
+        if normalized_user_id not in friend_list:
+            friend_list.append(normalized_user_id)
+
+    return {
+        'user_id': normalized_user_id,
+        **users[normalized_user_id],
+    }
+
+
+def add_friends_to_user(user_id, friend_ids):
+    """Adds one or more friends to an existing user profile."""
+    if user_id not in users:
+        raise ValueError(f'User {user_id} not found.')
+
+    user_friends = users[user_id].setdefault('friends', [])
+    added_friends = []
+
+    for friend_id in friend_ids or []:
+        if friend_id not in users or friend_id == user_id:
+            continue
+        if friend_id not in user_friends:
+            user_friends.append(friend_id)
+            added_friends.append(friend_id)
+
+        reverse_friends = users[friend_id].setdefault('friends', [])
+        if user_id not in reverse_friends:
+            reverse_friends.append(user_id)
+
+    return added_friends
+
 
 def get_user_workouts(user_id):
     """Returns a list of workouts for the given user.
@@ -91,43 +199,6 @@ def get_user_workouts(user_id):
         workout_id, start_timestamp, end_timestamp,
         start_lat_lng, end_lat_lng, distance, steps, calories_burned
     """
-    # This is our "table" of all workouts across all users
-    workouts_table = [
-        {
-            'user_id': 'user1',
-            'workout_id': 'workout1',
-            'start_timestamp': '2024-01-01 07:00:00',
-            'end_timestamp': '2024-01-01 07:30:00',
-            'start_lat_lng': (36.166, -86.783),
-            'end_lat_lng': (36.170, -86.780),
-            'distance': 2.5,
-            'steps': 4000,
-            'calories_burned': 220,
-        },
-        {
-            'user_id': 'user1',
-            'workout_id': 'workout2',
-            'start_timestamp': '2024-01-02 08:00:00',
-            'end_timestamp': '2024-01-02 08:45:00',
-            'start_lat_lng': (36.166, -86.783),
-            'end_lat_lng': (36.175, -86.790),
-            'distance': None,       # sometimes distance is not recorded
-            'steps': 5200,
-            'calories_burned': 300,
-        },
-        {
-            'user_id': 'user2',
-            'workout_id': 'workout3',
-            'start_timestamp': '2024-01-03 06:30:00',
-            'end_timestamp': '2024-01-03 07:00:00',
-            'start_lat_lng': None,  # sometimes location is not recorded
-            'end_lat_lng': None,
-            'distance': 1.8,
-            'steps': 2800,
-            'calories_burned': 150,
-        },
-    ]
-
     result = []
 
     # Loop through every workout, only keep ones matching this user
@@ -145,6 +216,37 @@ def get_user_workouts(user_id):
             })
 
     return result
+
+
+def add_user_workout(
+    user_id,
+    start_timestamp,
+    end_timestamp,
+    distance,
+    steps,
+    calories_burned,
+    start_lat_lng=None,
+    end_lat_lng=None,
+):
+    """Adds a workout to the in-memory data store used by the app."""
+    def normalize_timestamp(value):
+        if isinstance(value, datetime):
+            return value.strftime('%Y-%m-%d %H:%M:%S')
+        return str(value)
+
+    new_workout = {
+        'user_id': user_id,
+        'workout_id': str(uuid.uuid4()),
+        'start_timestamp': normalize_timestamp(start_timestamp),
+        'end_timestamp': normalize_timestamp(end_timestamp),
+        'start_lat_lng': start_lat_lng,
+        'end_lat_lng': end_lat_lng,
+        'distance': distance,
+        'steps': steps,
+        'calories_burned': calories_burned,
+    }
+    workouts_table.append(new_workout)
+    return new_workout
 
 
 def get_user_sensor_data(user_id, workout_id):
@@ -206,25 +308,12 @@ def get_user_profile(user_id):
 
     user_data = users[user_id]
 
-    #table for friendships
-    friends_table = [
-        {'UserId1': 'user1', 'UserId2': 'user2'},
-        {'UserId1': 'user3', 'UserId2': 'user1'},
-        {'UserId1': 'user1', 'UserId2': 'user4'},
-        {'UserId1': 'user3', 'UserId2': 'user4'},
-    ]
-    friend_ids = []
-    for relationship in friends_table:
-        if relationship['UserId1'] == user_id:
-            friend_ids.append(relationship['UserId2'])
-        elif relationship['UserId2'] == user_id:
-            friend_ids.append(relationship['UserId1'])
     return {
         'full_name': user_data.get('full_name'),
         'username': user_data.get('username'),
         'date_of_birth': user_data.get('date_of_birth'),
         'profile_image': user_data.get('profile_image'),
-        'friends': friend_ids
+        'friends': list(user_data.get('friends', []))
     }
 
 
