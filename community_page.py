@@ -1,9 +1,8 @@
 #############################################################################
 # community_page.py
 #
-# This file contains the community page for the app.
-# It displays the first 10 posts from a user's friends ordered by timestamp,
-# and one piece of GenAI advice and encouragement.
+# Revamped community page with polished UI.
+#
 #############################################################################
 
 import streamlit as st
@@ -13,37 +12,27 @@ from datetime import datetime
 
 
 def display_community_page(user_id):
-    """Displays the community page for the given user.
+    """Displays the community page for the given user."""
 
-    Shows the first 10 posts from the user's friends ordered by timestamp,
-    and one piece of GenAI advice and encouragement.
-
-    Parameters:
-        user_id (str): the ID of the current user
-    """
-
-    st.title("🌍 Community")
-    st.write("See what your friends are up to!")
-    st.write("---")
+    st.markdown("""
+    <div class="page-title">COMMUNITY</div>
+    <div class="page-subtitle">See what your friends are up to</div>
+    <hr class="custom-divider">
+    """, unsafe_allow_html=True)
 
     # --- GenAI Advice Section ---
-    st.subheader("✨ Your Daily Motivation")
+    st.markdown('<div class="section-title">Daily Motivation</div>', unsafe_allow_html=True)
     advice = get_genai_advice(user_id)
     if advice:
-        display_genai_advice(
-            advice['timestamp'],
-            advice['content'],
-            advice['image']
-        )
+        display_genai_advice(advice['timestamp'], advice['content'], advice['image'])
     else:
         st.info("No advice available right now. Check back later!")
 
-    st.write("---")
+    st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
     # --- Friends' Posts Section ---
-    st.subheader("📰 Friends' Posts")
+    st.markdown('<div class="section-title">Friends\' Posts</div>', unsafe_allow_html=True)
 
-    # Step 1: Get the current user's profile to find their friends
     try:
         profile = get_user_profile(user_id)
     except Exception as e:
@@ -53,27 +42,23 @@ def display_community_page(user_id):
     friend_ids = profile.get('friends', [])
 
     if not friend_ids:
-        st.info("You have no friends added yet. Add some friends to see their posts here!")
+        st.info("No friends added yet. Add some friends to see their posts!")
         return
 
-    # Step 2: Collect all posts from each friend
     all_posts = []
     for friend_id in friend_ids:
         try:
             friend_posts = get_user_posts(friend_id)
-            # Attach friend_id to each post in case it's missing
             for post in friend_posts:
                 post['user_id'] = post.get('user_id', friend_id)
             all_posts.extend(friend_posts)
         except Exception:
-            # If we can't get a friend's posts, skip them gracefully
             continue
 
     if not all_posts:
         st.info("None of your friends have posted yet!")
         return
 
-    # Step 3: Sort all posts by timestamp (oldest first) and take first 10
     def parse_timestamp(post):
         ts = post.get('timestamp', '')
         try:
@@ -81,17 +66,14 @@ def display_community_page(user_id):
         except Exception:
             return datetime.min
 
-    all_posts.sort(key=parse_timestamp)
+    all_posts.sort(key=parse_timestamp, reverse=True)
     posts_to_show = all_posts[:10]
 
-    # Step 4: Display each post
-    st.write(f"Showing {len(posts_to_show)} post(s) from your friends:")
-    st.write("")
+    st.markdown(f'<div style="font-size:12px;color:#4a5568;margin-bottom:16px;">{len(posts_to_show)} post(s) from your friends</div>', unsafe_allow_html=True)
 
     for post in posts_to_show:
         author_id = post.get('user_id', 'Unknown')
 
-        # Try to get the friend's profile for their username and image
         try:
             friend_profile = get_user_profile(author_id)
             username = friend_profile.get('username', author_id)
@@ -100,7 +82,6 @@ def display_community_page(user_id):
             username = author_id
             user_image = None
 
-        # Parse timestamp safely
         ts = post.get('timestamp', '')
         try:
             timestamp = datetime.strptime(str(ts), '%Y-%m-%d %H:%M:%S')
@@ -110,5 +91,8 @@ def display_community_page(user_id):
         content = post.get('content', '')
         post_image = post.get('image', None)
 
+        # Skip posts with no content and no image
+        if not content and not post_image:
+            continue
+
         display_post(username, user_image, timestamp, content, post_image)
-        st.write("---")
