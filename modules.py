@@ -1,10 +1,5 @@
 #############################################################################
 # modules.py
-#
-# This file contains modules that may be used throughout the app.
-#
-# You will write these in Unit 2. Do not change the names or inputs of any
-# function other than the example.
 #############################################################################
 
 from internals import create_component
@@ -12,161 +7,484 @@ import streamlit as st
 import os
 
 
-# This one has been written for you as an example. You may change it as wanted.
-def display_my_custom_component(value):
-    """Displays a 'my custom component' which showcases an example of how custom
-    components work.
+def inject_global_styles():
+    """Injects global CSS styles for the app."""
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap');
 
-    value: the name you'd like to be called by within the app
-    """
-    data = {
-        'NAME': value,
+    :root {
+        --accent: #C6FF00;
+        --accent-dim: #8fb300;
+        --bg-deep: #0d0f14;
+        --bg-card: #161b24;
+        --bg-card2: #1e2535;
+        --border: rgba(198,255,0,0.15);
+        --border-subtle: rgba(255,255,255,0.07);
+        --text-primary: #f0f4ff;
+        --text-secondary: #8a93a8;
+        --text-muted: #4a5568;
+        --success: #39d98a;
+        --warning: #f6a623;
+        --danger: #ff5c5c;
     }
-    html_file_name = "my_custom_component"
-    create_component(data, html_file_name)
+
+    html, body, [class*="css"] {
+        font-family: 'DM Sans', sans-serif !important;
+        background-color: var(--bg-deep) !important;
+        color: var(--text-primary) !important;
+    }
+
+    #MainMenu { visibility: hidden; }
+    footer { visibility: hidden; }
+    .stDeployButton { display: none; }
+
+    .main .block-container {
+        padding: 2rem 2.5rem 3rem 2.5rem !important;
+        max-width: 1100px !important;
+    }
+
+    section[data-testid="stSidebar"] {
+        background: #0d0f14 !important;
+        border-right: 1px solid var(--border-subtle) !important;
+    }
+    section[data-testid="stSidebar"] label {
+        color: var(--text-secondary) !important;
+        font-size: 11px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1.5px !important;
+        font-weight: 600 !important;
+    }
+
+    /* Metric cards */
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin: 20px 0 28px 0;
+    }
+    .metric-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: 14px;
+        padding: 18px 20px 16px 20px;
+        position: relative;
+        overflow: hidden;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+    .metric-card:hover { border-color: var(--border); transform: translateY(-2px); }
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    .metric-icon { font-size: 20px; margin-bottom: 8px; display: block; }
+    .metric-value {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 32px; font-weight: 800;
+        color: var(--accent); line-height: 1; margin-bottom: 4px;
+    }
+    .metric-label {
+        font-size: 11px; font-weight: 600;
+        text-transform: uppercase; letter-spacing: 1px;
+        color: var(--text-secondary);
+    }
+
+    /* Workout cards */
+    .workout-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: 16px;
+        padding: 22px 24px;
+        margin-bottom: 14px;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 16px;
+        align-items: center;
+        transition: border-color 0.2s;
+    }
+    .workout-card:hover { border-color: var(--border); }
+    .workout-index {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 42px; font-weight: 800;
+        color: var(--text-muted); line-height: 1; min-width: 40px;
+    }
+    .workout-time {
+        font-size: 13px; color: var(--text-secondary);
+        margin-bottom: 8px;
+    }
+    .workout-stats { display: flex; gap: 20px; flex-wrap: wrap; }
+    .workout-stat { display: flex; flex-direction: column; }
+    .workout-stat-val {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 20px; font-weight: 700; color: var(--text-primary);
+    }
+    .workout-stat-lbl {
+        font-size: 10px; text-transform: uppercase;
+        letter-spacing: 0.8px; color: var(--text-muted); font-weight: 600;
+    }
+    .duration-val {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 24px; font-weight: 700; color: var(--accent);
+    }
+    .duration-lbl {
+        font-size: 10px; text-transform: uppercase;
+        letter-spacing: 0.8px; color: var(--text-muted);
+        font-weight: 600; display: block;
+    }
+
+    /* Section headers */
+    .section-title {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 13px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 2.5px;
+        color: var(--accent); margin: 32px 0 16px 0;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::after {
+        content: ''; flex: 1; height: 1px;
+        background: var(--border-subtle);
+    }
+
+    /* Page title */
+    .page-title {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 52px; font-weight: 800;
+        color: var(--text-primary); line-height: 1;
+        margin-bottom: 4px; letter-spacing: -1px;
+    }
+    .page-subtitle {
+        font-size: 14px; color: var(--text-secondary);
+        margin-bottom: 0; font-weight: 400;
+    }
+
+    /* Post card */
+    .post-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-subtle);
+        border-radius: 16px; padding: 20px 22px;
+        margin-bottom: 14px; transition: border-color 0.2s;
+    }
+    .post-card:hover { border-color: var(--border); }
+    .post-header {
+        display: flex; align-items: center;
+        gap: 12px; margin-bottom: 12px;
+    }
+    .post-username { font-weight: 600; font-size: 14px; color: var(--text-primary); }
+    .post-time { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+    .post-content { font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
+
+    /* Advice card */
+    .advice-card {
+        background: linear-gradient(135deg, var(--bg-card) 0%, #1a2235 100%);
+        border: 1px solid var(--border);
+        border-radius: 16px; padding: 24px 26px;
+        margin: 16px 0; position: relative; overflow: hidden;
+    }
+    .advice-card::before {
+        content: ''; position: absolute;
+        top: -40px; right: -40px;
+        width: 120px; height: 120px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(198,255,0,0.12), transparent 70%);
+    }
+    .advice-label {
+        font-family: 'Barlow Condensed', sans-serif;
+        font-size: 11px; font-weight: 700;
+        text-transform: uppercase; letter-spacing: 2px;
+        color: var(--accent); margin-bottom: 10px;
+    }
+    .advice-text { font-size: 15px; line-height: 1.7; color: var(--text-primary); }
+    .advice-timestamp { font-size: 11px; color: var(--text-muted); margin-top: 12px; }
+
+    /* Divider */
+    .custom-divider {
+        border: none; border-top: 1px solid var(--border-subtle); margin: 28px 0;
+    }
+
+    /* Inputs */
+    .stTextInput input, .stTextArea textarea {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-subtle) !important;
+        border-radius: 10px !important;
+        color: var(--text-primary) !important;
+    }
+    .stTextInput input:focus, .stTextArea textarea:focus {
+        border-color: var(--accent) !important;
+        box-shadow: 0 0 0 2px rgba(198,255,0,0.1) !important;
+    }
+
+    /* Buttons */
+    .stButton button {
+        background: var(--accent) !important;
+        color: #0d0f14 !important;
+        font-weight: 700 !important;
+        font-family: 'DM Sans', sans-serif !important;
+        border: none !important;
+        border-radius: 10px !important;
+        transition: opacity 0.2s, transform 0.1s !important;
+    }
+    .stButton button:hover {
+        opacity: 0.88 !important;
+        transform: translateY(-1px) !important;
+    }
+
+    /* Forms */
+    [data-testid="stVerticalBlock"] > [data-testid="stForm"] {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-subtle) !important;
+        border-radius: 14px !important;
+        padding: 1rem !important;
+    }
+
+    /* Progress bar */
+    .stProgress > div > div {
+        background: var(--accent) !important; border-radius: 4px !important;
+    }
+    .stProgress > div {
+        background: var(--bg-card2) !important; border-radius: 4px !important;
+    }
+
+    /* Alerts */
+    .stSuccess { background: rgba(57,217,138,0.1) !important; border-left: 3px solid var(--success) !important; border-radius: 8px !important; }
+    .stWarning { background: rgba(246,166,35,0.1) !important; border-left: 3px solid var(--warning) !important; }
+    .stInfo { background: rgba(198,255,0,0.07) !important; border-left: 3px solid var(--accent-dim) !important; }
+
+    /* Number input */
+    .stNumberInput input {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-subtle) !important;
+        color: var(--text-primary) !important;
+        border-radius: 10px !important;
+    }
+
+    /* Select box */
+    .stSelectbox [data-baseweb="select"] > div {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-subtle) !important;
+        border-radius: 10px !important;
+        color: var(--text-primary) !important;
+    }
+
+    /* Multiselect */
+    .stMultiSelect [data-baseweb="select"] > div {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-subtle) !important;
+        border-radius: 10px !important;
+    }
+
+    /* Date/time inputs */
+    .stDateInput input, .stTimeInput input {
+        background: var(--bg-card) !important;
+        border: 1px solid var(--border-subtle) !important;
+        color: var(--text-primary) !important;
+        border-radius: 10px !important;
+    }
+
+    /* File uploader */
+    .stFileUploader {
+        background: var(--bg-card) !important;
+        border: 1px dashed var(--border-subtle) !important;
+        border-radius: 10px !important;
+    }
+
+    /* Labels */
+    [data-testid="stTextInput"] label,
+    [data-testid="stTextArea"] label,
+    [data-testid="stSelectbox"] label,
+    [data-testid="stDateInput"] label,
+    [data-testid="stTimeInput"] label,
+    [data-testid="stNumberInput"] label,
+    [data-testid="stFileUploader"] label,
+    [data-testid="stMultiSelect"] label {
+        color: var(--text-secondary) !important;
+        font-weight: 600 !important;
+        font-size: 12px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+    }
+
+    /* Radio */
+    .stRadio label { color: var(--text-secondary) !important; }
+
+    /* Metrics */
+    [data-testid="stMetricValue"] {
+        color: var(--accent) !important;
+        font-family: 'Barlow Condensed', sans-serif !important;
+        font-size: 28px !important;
+        font-weight: 800 !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: var(--text-muted) !important;
+        font-size: 11px !important;
+        text-transform: uppercase !important;
+        letter-spacing: 1px !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+
+def display_my_custom_component(value):
+    data = {'NAME': value}
+    create_component(data, "my_custom_component")
 
 
 def display_post(username, user_image, timestamp, content, post_image):
-    """
-    Displays the post from a user.
+    """Displays a polished post card."""
+    ts_str = timestamp.strftime("%b %d, %Y · %I:%M %p") if hasattr(timestamp, 'strftime') else str(timestamp)
+    initial = username[0].upper() if username else "?"
 
-    Parameters:
-        username (str): username for the user who made the post
-        user_image (UploadedFile): image for the user who made the post
-        timestamp (datetime): time the post was made
-        content (str): description of post
-        post_image (UploadedFile): image for the post
+    if user_image and isinstance(user_image, str) and user_image.startswith('http'):
+        avatar_html = f'<img src="{user_image}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(198,255,0,0.3);">'
+    elif user_image and isinstance(user_image, bytes):
+        import base64
+        b64 = base64.b64encode(user_image).decode()
+        avatar_html = f'<img src="data:image/jpeg;base64,{b64}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(198,255,0,0.3);">'
+    else:
+        avatar_html = f'<div style="width:40px;height:40px;border-radius:50%;background:#1e2535;border:2px solid rgba(198,255,0,0.3);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;color:#C6FF00;">{initial}</div>'
 
-    Returns:
-        Nothing
-    """
+    st.markdown(f"""
+    <div class="post-card">
+        <div class="post-header">
+            {avatar_html}
+            <div>
+                <div class="post-username">{username}</div>
+                <div class="post-time">{ts_str}</div>
+            </div>
+        </div>
+        <div class="post-content">{content}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if user_image:
-            try:
-                st.image(user_image, width=50)
-            except Exception:
-                st.caption("Profile image unavailable")
-    with col2:
-        st.write(username)
     if post_image:
         try:
-            if isinstance(post_image, str) and not (post_image.startswith("http://") or post_image.startswith("https://")):
-                if os.path.exists(post_image):
-                    st.image(post_image)
-                else:
-                    st.caption("Post image unavailable")
-            else:
-                st.image(post_image)
+            if isinstance(post_image, str):
+                if post_image.startswith('http'):
+                    st.image(post_image, use_container_width=True)
+                elif os.path.exists(post_image):
+                    st.image(post_image, use_container_width=True)
+            elif isinstance(post_image, bytes):
+                st.image(post_image, use_container_width=True)
         except Exception:
-            st.caption("Post image unavailable")
-    st.write(content)
-    st.caption(timestamp.strftime("%B %d, %Y at %I:%M %p"))
+            pass
 
 
 def display_activity_summary(workouts_list):
+    """Displays a polished activity summary with metric cards."""
     if not workouts_list:
-        st.write("No workouts recorded.")
+        st.markdown('<div style="color:#4a5568;font-size:14px;padding:20px 0;">No workouts recorded yet.</div>', unsafe_allow_html=True)
         return None
 
     total_dist = sum(w.get('distance') or 0 for w in workouts_list)
     total_steps = sum(w.get('steps') or 0 for w in workouts_list)
     total_cals = sum((w.get('calories_burned') if w.get('calories_burned') is not None else w.get('calories')) or 0 for w in workouts_list)
+    total_workouts = len(workouts_list)
 
-    st.header("Activity Summary")
-    st.write("==============================")
-    st.subheader("Totals Summary")
+    # Calculate total duration
+    total_mins = 0
+    from datetime import datetime
+    for w in workouts_list:
+        try:
+            start = datetime.strptime(str(w.get('start_timestamp', '')), '%Y-%m-%d %H:%M:%S')
+            end = datetime.strptime(str(w.get('end_timestamp', '')), '%Y-%m-%d %H:%M:%S')
+            total_mins += int((end - start).total_seconds() / 60)
+        except Exception:
+            pass
 
-    st.write(f"**Total Workouts:** {len(workouts_list)}")
-    st.write(f"**Total Distance:** {total_dist:.1f} miles")
-    st.write(f"**Total Steps:** {total_steps:,}")
-    st.write(f"**Total Calories:** {total_cals}")
-    st.write("------------------------------")
-
-    for i, workout in enumerate(workouts_list, 1):
-        start = workout.get('start_timestamp', 'Unknown')
-        end = workout.get('end_timestamp', 'Unknown')
-        dist = workout.get('distance', 0)
-        steps = workout.get('steps', 0)
-        calories = workout.get('calories_burned')
-        if calories is None:
-            calories = workout.get('calories', 0)
-
-        st.write(f"### Workout {i}")
-        st.write(f"**Start:** {start} | **End:** {end}")
-        st.write(f"**Distance:** {dist} miles")
-        st.write(f"**Steps:** {steps:,}")
-        st.write(f"**Calories:** {calories}")
-        st.write("------------------------------")
+    st.markdown(f"""
+    <div class="metric-grid">
+        <div class="metric-card">
+            <span class="metric-icon">🏋️</span>
+            <div class="metric-value">{total_workouts}</div>
+            <div class="metric-label">Workouts</div>
+        </div>
+        <div class="metric-card">
+            <span class="metric-icon">📍</span>
+            <div class="metric-value">{total_dist:.1f}</div>
+            <div class="metric-label">Miles</div>
+        </div>
+        <div class="metric-card">
+            <span class="metric-icon">👟</span>
+            <div class="metric-value">{total_steps:,}</div>
+            <div class="metric-label">Steps</div>
+        </div>
+        <div class="metric-card">
+            <span class="metric-icon">🔥</span>
+            <div class="metric-value">{total_cals:,}</div>
+            <div class="metric-label">Calories</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     return None
 
 
 def display_recent_workouts(workouts_list=[]):
-    """
-    Displays a list of recent workouts using a custom HTML component.
-    Each workout shows its distance, steps, and calories.
-
-    Parameters:
-        workouts_list (list): A list of workout dictionaries, each containing:
-            - 'distance': miles traveled
-            - 'steps': steps taken
-            - 'calories': calories burned
-            - 'start_time': when the workout started
-            - 'end_time': when the workout ended
-    """
-
+    """Displays polished workout cards."""
     if not workouts_list:
-        st.info("No recent workouts to show.")
+        st.markdown('<div style="color:#4a5568;font-size:14px;padding:16px 0;">No recent workouts to show.</div>', unsafe_allow_html=True)
         return
 
-    cards_html = ""
+    from datetime import datetime
 
     for i, workout in enumerate(workouts_list, start=1):
-        start = workout.get('start_timestamp', 'Unknown')
-        end = workout.get('end_timestamp', 'Unknown')
-        distance = workout.get('distance', 0)
-        steps = workout.get('steps', 0)
-        calories = workout.get('calories_burned')
-        if calories is None:
-            calories = workout.get('calories', 0)
+        start_raw = workout.get('start_timestamp', '')
+        end_raw = workout.get('end_timestamp', '')
+        distance = workout.get('distance')
+        steps = workout.get('steps') or 0
+        cals = (workout.get('calories_burned') if workout.get('calories_burned') is not None else workout.get('calories')) or 0
 
-        cards_html += f"""
-        <div style="border: 1px solid #ddd;
-                    padding: 14px;
-                    border-radius: 10px;
-                    background-color: #f9f9f9;
-                    margin-bottom: 8px;">
-            <p style="margin: 0 0 6px 0; font-weight: bold; color: #444;">
-                Workout {i}
-            </p>
-            <p style="margin: 2px 0;"><strong>Distance:</strong> {distance} miles</p>
-            <p style="margin: 2px 0;"><strong>Steps:</strong> {steps:,}</p>
-            <p style="margin: 2px 0;"><strong>Calories:</strong> {calories}</p>
-            <p style="margin: 6px 0 0 0; font-size: 0.8em; color: #888;">
-                {start} to {end}
-            </p>
+        dist_str = f"{distance:.1f} mi" if distance is not None else "—"
+
+        duration_str = "—"
+        time_label = "min"
+        date_str = str(start_raw)
+        try:
+            start_dt = datetime.strptime(str(start_raw), '%Y-%m-%d %H:%M:%S')
+            end_dt = datetime.strptime(str(end_raw), '%Y-%m-%d %H:%M:%S')
+            mins = int((end_dt - start_dt).total_seconds() / 60)
+            duration_str = f"{mins}"
+            date_str = start_dt.strftime("%b %d, %Y · %I:%M %p")
+        except Exception:
+            pass
+
+        st.markdown(f"""
+        <div class="workout-card">
+            <div class="workout-index">0{i}</div>
+            <div>
+                <div class="workout-time">📅 {date_str}</div>
+                <div class="workout-stats">
+                    <div class="workout-stat">
+                        <span class="workout-stat-val">{dist_str}</span>
+                        <span class="workout-stat-lbl">Distance</span>
+                    </div>
+                    <div class="workout-stat">
+                        <span class="workout-stat-val">{steps:,}</span>
+                        <span class="workout-stat-lbl">Steps</span>
+                    </div>
+                    <div class="workout-stat">
+                        <span class="workout-stat-val">{cals:,}</span>
+                        <span class="workout-stat-lbl">Calories</span>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align:right;">
+                <span class="duration-val">{duration_str}</span>
+                <span class="duration-lbl">{time_label}</span>
+            </div>
         </div>
-        """
-
-    data = {
-        'WORKOUT_CARDS': cards_html
-    }
-    create_component(data, "display_recent_workouts")
+        """, unsafe_allow_html=True)
 
 
 def display_genai_advice(timestamp, content, image):
+    """Displays a polished AI advice card."""
+    st.markdown(f"""
+    <div class="advice-card">
+        <div class="advice-label">⚡ AI Coach · Generated {timestamp}</div>
+        <div class="advice-text">{content}</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    st.subheader("AI-Powered Advice")
-    st.caption(f"Generated on: {timestamp}")
-
-    col1, col2 = st.columns([2, 1])
-
-    with col1:
-        st.markdown("### Your Personalized Advice")
-        st.write(content)
-
-    with col2:
-        if image:
-            st.image(image, caption="Stay Motivated!", width=300)
+    if image and isinstance(image, str) and image.startswith('http'):
+        st.image(image, use_container_width=True) 

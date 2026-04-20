@@ -3,8 +3,8 @@
 #############################################################################
 
 import streamlit as st
-
 from modules import (
+    inject_global_styles,
     display_activity_summary,
     display_genai_advice,
     display_recent_workouts,
@@ -23,72 +23,7 @@ from meal_plan_page import display_meal_plan_page
 from profile_page import display_profile_page
 
 
-st.set_page_config(page_title="SDS Fitness App", layout="wide")
-
-
-def apply_app_styles():
-    """Applies shared spacing and typography styles across the app."""
-    st.markdown(
-        """
-        <style>
-        .block-container {
-            max-width: 1100px;
-            padding-top: 2rem;
-            padding-bottom: 2.5rem;
-        }
-        h1 {
-            font-size: 2.2rem !important;
-            line-height: 1.2 !important;
-            margin-bottom: 0.35rem !important;
-        }
-        h2 {
-            font-size: 1.55rem !important;
-            line-height: 1.25 !important;
-            margin-top: 0.5rem !important;
-            margin-bottom: 0.5rem !important;
-        }
-        h3 {
-            font-size: 1.15rem !important;
-            line-height: 1.35 !important;
-        }
-        p, li, label, [data-testid="stMarkdownContainer"] {
-            font-size: 0.98rem !important;
-            line-height: 1.55 !important;
-        }
-        [data-testid="stCaptionContainer"] {
-            font-size: 0.86rem !important;
-        }
-        [data-testid="stVerticalBlock"] > [data-testid="stForm"] {
-            border: 1px solid #e5e7eb;
-            border-radius: 14px;
-            padding: 1rem 1rem 0.25rem 1rem;
-            background: #fafafa;
-        }
-        [data-testid="stButton"] > button,
-        [data-testid="stFormSubmitButton"] > button {
-            border-radius: 10px;
-            font-size: 0.95rem;
-            padding-top: 0.45rem;
-            padding-bottom: 0.45rem;
-        }
-        [data-testid="stTextInput"] label,
-        [data-testid="stTextArea"] label,
-        [data-testid="stSelectbox"] label,
-        [data-testid="stDateInput"] label,
-        [data-testid="stTimeInput"] label,
-        [data-testid="stNumberInput"] label,
-        [data-testid="stFileUploader"] label,
-        [data-testid="stMultiSelect"] label {
-            font-weight: 600 !important;
-            font-size: 0.95rem !important;
-        }
-        section[data-testid="stSidebar"] .block-container {
-            padding-top: 1.25rem;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True,
-    )
+st.set_page_config(page_title="SDS Fitness", page_icon="🏃", layout="wide")
 
 
 def display_app_page(user_id):
@@ -99,65 +34,85 @@ def display_app_page(user_id):
     except Exception:
         username = user_id
 
-    st.title("Welcome to SDS!")
-    st.header("Your Fitness Dashboard")
+    st.markdown(f"""
+    <div class="page-title">SDS FITNESS</div>
+    <div class="page-subtitle">Welcome back, <span style="color:#C6FF00;">{username}</span></div>
+    <hr class="custom-divider">
+    """, unsafe_allow_html=True)
 
     workouts = get_user_workouts(user_id) or []
-    recent_workout_count = len(workouts)
 
-    stat_col1, stat_col2, stat_col3 = st.columns(3)
-    stat_col1.metric("User Code", user_id)
-    stat_col2.metric("Username", username)
-    stat_col3.metric("Workouts Logged", recent_workout_count)
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.markdown(f"""
+        <div style="background:#161b24;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#4a5568;font-weight:600;">User Code</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:#C6FF00;margin-top:4px;">{user_id}</div>
+        </div>""", unsafe_allow_html=True)
+    with col2:
+        st.markdown(f"""
+        <div style="background:#161b24;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#4a5568;font-weight:600;">Username</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:#f0f4ff;margin-top:4px;">{username}</div>
+        </div>""", unsafe_allow_html=True)
+    with col3:
+        st.markdown(f"""
+        <div style="background:#161b24;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px 20px;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#4a5568;font-weight:600;">Workouts Logged</div>
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:700;color:#f0f4ff;margin-top:4px;">{len(workouts)}</div>
+        </div>""", unsafe_allow_html=True)
 
-    st.write("---")
+    st.markdown("<div style='margin-top:8px;'></div>", unsafe_allow_html=True)
 
+    st.markdown('<div class="section-title">Activity Summary</div>', unsafe_allow_html=True)
     display_activity_summary(workouts)
-    st.write("---")
 
-    st.subheader("Recent Sessions")
+    st.markdown('<div class="section-title">Recent Sessions</div>', unsafe_allow_html=True)
     display_recent_workouts(workouts)
-    st.write("---")
+
+    st.markdown('<hr class="custom-divider">', unsafe_allow_html=True)
 
     advice = get_genai_advice(user_id)
     if advice:
+        st.markdown('<div class="section-title">AI Coach</div>', unsafe_allow_html=True)
         display_genai_advice(advice["timestamp"], advice["content"], advice["image"])
-    st.write("---")
 
 
 if __name__ == "__main__":
-    apply_app_styles()
+    inject_global_styles()
 
     default_user_id = st.session_state.get("current_user_id", "user1")
 
     with st.sidebar:
-        st.header("User Login")
+        st.markdown("""
+        <div style="padding: 20px 0 28px 0;">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:26px;font-weight:800;color:#C6FF00;letter-spacing:1px;">SDS</div>
+            <div style="font-size:11px;color:#4a5568;text-transform:uppercase;letter-spacing:2px;font-weight:600;">Fitness Tracker</div>
+        </div>
+        """, unsafe_allow_html=True)
+
         entered_user_id = st.text_input(
-            "Enter your user code",
+            "User code",
             value=default_user_id,
-            help="Try one of these sample codes: " + ", ".join(get_available_user_ids()),
+            help="Try: " + ", ".join(get_available_user_ids()),
         ).strip()
         st.session_state["current_user_id"] = entered_user_id
 
-    if not entered_user_id:
-        st.sidebar.info("Create a profile to get started.")
-        display_profile_page()
-        st.stop()
-
-    page = st.sidebar.selectbox(
-        "Navigate",
-        ["Home", "Community", "Activity", "Goal Setter", "Meal Plan", "Create Profile"],
-    )
+        page = st.selectbox(
+            "Navigate",
+            ["Home", "Community", "Activity", "Goal Setter", "Meal Plan", "Create Profile"],
+        )
 
     if page == "Create Profile":
         display_profile_page()
         st.stop()
 
+    if not entered_user_id:
+        st.info("Enter a user code to get started.")
+        st.stop()
+
     if not user_exists(entered_user_id):
-        st.error(
-            "That user code was not found. Try one of these sample codes: "
-            + ", ".join(get_available_user_ids())
-        )
+        st.error("User code not found. Try: " + ", ".join(get_available_user_ids()))
         st.stop()
 
     if page == "Home":
