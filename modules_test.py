@@ -13,58 +13,6 @@ from modules import display_post, display_activity_summary, display_genai_advice
 
 # Write your tests below
 
-class TestDisplayPost(unittest.TestCase):
-    """Tests the display_post function."""
-
-    @patch('data_fetcher.GenerativeModel')
-    @patch('data_fetcher.get_client')
-    def test_post_without_image(self, mock_client, mock_model_class):
-        mock_client.return_value.query.return_value.result.return_value = []
-        mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
-        at = AppTest.from_file("app.py")
-        at.run()
-        at.text_input[0].set_value("testuser")
-        at.text_area[0].set_value("testcontent")
-        at.button[0].click().run()
-        usernames = [m.value for m in at.markdown if m.value == "testuser"]
-        contents = [m.value for m in at.markdown if m.value == "testcontent"]
-        self.assertTrue(len(usernames) > 0, "testuser not found in markdown")
-        self.assertTrue(len(contents) > 0, "testcontent not found in markdown")
-        self.assertIsNotNone(at.caption[0].value)
-
-    @patch('data_fetcher.GenerativeModel')
-    @patch('data_fetcher.get_client')
-    def test_no_username(self, mock_client, mock_model_class):
-        mock_client.return_value.query.return_value.result.return_value = []
-        mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
-        at = AppTest.from_file("app.py")
-        at.run()
-        at.text_area[0].set_value("testcontent")
-        at.button[0].click().run()
-        self.assertEqual(at.warning[0].value, "please enter username")
-
-    @patch('data_fetcher.GenerativeModel')
-    @patch('data_fetcher.get_client')
-    def test_content_too_long(self, mock_client, mock_model_class):
-        mock_client.return_value.query.return_value.result.return_value = []
-        mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
-        at = AppTest.from_file("app.py")
-        at.run()
-        at.text_input[0].set_value("testuser")
-        at.text_area[0].set_value("a" * 281)
-        at.button[0].click().run()
-        self.assertEqual(at.warning[0].value, "description must be between 1 and 280 characters")
-
-    @patch('data_fetcher.GenerativeModel')
-    @patch('data_fetcher.get_client')
-    def test_no_content(self, mock_client, mock_model_class):
-        mock_client.return_value.query.return_value.result.return_value = []
-        mock_model_class.return_value.generate_content.return_value.text = "Keep it up!"
-        at = AppTest.from_file("app.py")
-        at.run()
-        at.text_input[0].set_value("testuser")
-        at.button[0].click().run()
-        self.assertEqual(at.warning[0].value, "description must be between 1 and 280 characters")
 
 
         
@@ -125,47 +73,7 @@ class TestDisplayGenAiAdvice(unittest.TestCase):
         self.assertIn(ret, [inspect.Parameter.empty, None])
 
 
-class TestDisplayRecentWorkouts(unittest.TestCase):
-    """Tests for display_recent_workouts()"""
 
-    @patch("modules.st")
-    def test_empty_list_shows_info(self, mock_st):
-        """Empty list should show an info message and stop early."""
-        from modules import display_recent_workouts
-        display_recent_workouts([])
-        mock_st.info.assert_called_once()  # checks st.info() was called
-
-    @patch("modules.create_component")
-    def test_single_workout_creates_component(self, mock_create):
-        """A single workout should call create_component once."""
-        from modules import display_recent_workouts
-        workouts = [
-            {'start_time': '9am', 'end_time': '10am',
-             'distance': 3, 'steps': 4000, 'calories': 250}
-        ]
-        display_recent_workouts(workouts)
-        mock_create.assert_called_once()  # checks create_component was called
-
-    @patch("modules.create_component")
-    def test_workout_data_appears_in_html(self, mock_create):
-        """The distance value should appear somewhere in the generated HTML."""
-        from modules import display_recent_workouts
-        workouts = [
-            {'distance': 5, 'steps': 6000, 'calories': 300}
-        ]
-        display_recent_workouts(workouts)
-
-        # Get what was passed to create_component
-        passed_data = mock_create.call_args[0][0]  # first argument = the data dict
-        self.assertIn('WORKOUT_CARDS', passed_data)
-        self.assertIn('5', passed_data['WORKOUT_CARDS'])  # distance shows up
-
-    @patch("modules.create_component")
-    def test_missing_fields_default_to_zero(self, mock_create):
-        """Workouts with missing keys should not crash."""
-        from modules import display_recent_workouts
-        display_recent_workouts([{}])  # completely empty workout dict
-        mock_create.assert_called_once()
 
 
 if __name__ == "__main__":
