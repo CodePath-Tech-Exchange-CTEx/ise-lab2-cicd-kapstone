@@ -5,7 +5,7 @@ Amya Brooks,
 Johnny Aryeetey, 
 Pratham Pathak
  # Website: 
-https://ise-lab2-cicd-kapstone-199741713332.us-west1.run.app
+https://kapstone-website-199741713332.us-central1.run.app/
  
 
 One person needs to follow SETUP.md to complete setup. Ignore this if it is already done for you!
