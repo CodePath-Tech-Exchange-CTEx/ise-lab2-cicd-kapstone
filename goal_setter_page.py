@@ -2,6 +2,8 @@
 # goal_setter_page.py
 #############################################################################
 
+import html
+import textwrap
 import streamlit as st
 
 
@@ -54,8 +56,18 @@ def save_edit(goal_id, new_name, new_target, new_unit):
     st.session_state["editing_id"] = None
 
 
+def _escape_text(value):
+    """Escapes user text before it is inserted into HTML-enabled markdown."""
+    return html.escape(str(value), quote=True)
+
+
 def display_goal_card(goal):
     pct = int((goal["completed"] / goal["target"]) * 100) if goal["target"] > 0 else 0
+    safe_name = _escape_text(goal["name"])
+    safe_target = _escape_text(goal["target"])
+    safe_unit = _escape_text(goal["unit"])
+    safe_timeframe = _escape_text(goal["timeframe"])
+    safe_type = _escape_text(goal["type"])
 
     if pct >= 100:
         accent = "#39d98a"
@@ -71,35 +83,37 @@ def display_goal_card(goal):
     if goal["activity"]:
         rows = "".join(
             f'<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:12px;color:#8a93a8;">'
-            f'<span style="width:6px;height:6px;border-radius:50%;background:{accent};flex-shrink:0;"></span>{item}</div>'
+            f'<span style="width:6px;height:6px;border-radius:50%;background:{accent};flex-shrink:0;"></span>{_escape_text(item)}</div>'
             for item in goal["activity"]
         )
-        activity_html = f"""
-        <div style="margin-top:10px;">
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#4a5568;font-weight:600;margin-bottom:4px;">Recent Activity</div>
-            {rows}
-        </div>
-        """
+        activity_html = textwrap.dedent(f"""
+            <div style="margin-top:10px;">
+                <div style="font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#4a5568;font-weight:600;margin-bottom:4px;">Recent Activity</div>
+                {rows}
+            </div>
+        """).strip()
 
-    st.markdown(f"""
-    <div style="background:#161b24;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:22px 24px;margin-bottom:14px;position:relative;overflow:hidden;">
-        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,{accent},transparent);"></div>
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
-            <div>
-                <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#f0f4ff;margin-bottom:4px;">{goal['name']}</div>
-                <div style="display:flex;gap:8px;align-items:center;">
-                    <span style="background:{badge_bg};color:{accent};border:1px solid {accent}30;border-radius:20px;font-size:10px;font-weight:700;padding:2px 10px;text-transform:uppercase;letter-spacing:0.8px;">{goal['type']}</span>
-                    <span style="font-size:11px;color:#4a5568;">{goal['timeframe']}</span>
+    card_html = textwrap.dedent(f"""
+        <div style="background:#161b24;border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:22px 24px;margin-bottom:14px;position:relative;overflow:hidden;">
+            <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,{accent},transparent);"></div>
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
+                <div>
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;color:#f0f4ff;margin-bottom:4px;">{safe_name}</div>
+                    <div style="display:flex;gap:8px;align-items:center;">
+                        <span style="background:{badge_bg};color:{accent};border:1px solid {accent}30;border-radius:20px;font-size:10px;font-weight:700;padding:2px 10px;text-transform:uppercase;letter-spacing:0.8px;">{safe_type}</span>
+                        <span style="font-size:11px;color:#4a5568;">{safe_timeframe}</span>
+                    </div>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:800;color:{accent};line-height:1;">{pct}%</div>
+                    <div style="font-size:11px;color:#4a5568;">{goal['completed']} / {safe_target} {safe_unit}</div>
                 </div>
             </div>
-            <div style="text-align:right;">
-                <div style="font-family:'Barlow Condensed',sans-serif;font-size:40px;font-weight:800;color:{accent};line-height:1;">{pct}%</div>
-                <div style="font-size:11px;color:#4a5568;">{goal['completed']} / {goal['target']} {goal['unit']}</div>
-            </div>
+            {activity_html}
         </div>
-        {activity_html}
-    </div>
-    """, unsafe_allow_html=True)
+    """).strip()
+
+    st.markdown(card_html, unsafe_allow_html=True)
 
     st.progress(pct / 100)
 
